@@ -10,12 +10,12 @@ export class Post {
   id!: number;
 
   @Field(() => String)
-  @Property({ type: "date"})
-  createdAt = new Date();
+  @Property({ type: "date" })
+  createdAt? = new Date();
 
   @Field(() => String)
   @Property({ type: "date", onUpdate: () => new Date() })
-  updatedAt = new Date();
+  updatedAt? = new Date();
 
   @Field(() => String)
   @Property({type: "text"})
