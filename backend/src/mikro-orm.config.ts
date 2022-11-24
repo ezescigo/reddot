@@ -11,7 +11,7 @@ const config = {
   entities: [Post],
   dbName: 'lireddot',
   // user: '',
-  password: 'saigon',
+  password: 'saigon3431',
   type: 'postgresql',
   debug: !__prod__
 } as Options;
