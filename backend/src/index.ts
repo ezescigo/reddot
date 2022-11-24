@@ -7,6 +7,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
+import { UserResolver } from './resolvers/user';
 
 import redis from 'redis';
 import session from "express-session";
@@ -61,7 +62,7 @@ const main = async () => {
   
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, PostResolver],
+      resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false
     }),
     context: ({ req, res }): MyContext => ({ em: orm.em.fork(), req, res })  // object accesible by our resolvers.
