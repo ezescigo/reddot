@@ -12,7 +12,7 @@ const config = {
   entities: [Post, User],
   dbName: 'lireddot',
   // user: '',
-  password: 'saigon',
+  password: 'saigon3431',
   type: 'postgresql',
   debug: !__prod__
 } as Options;
