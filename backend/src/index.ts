@@ -13,7 +13,6 @@ import cors from "cors";
 import Redis from "ioredis";
 import session from "express-session";
 import connectRedis from 'connect-redis';
-//import { MyContext } from './types';
 
 
 const main = async () => {
@@ -47,9 +46,6 @@ const main = async () => {
   redisClient.on('error', (err) => console.log('Redis Client Error', err));
   redisClient.connect().catch(console.error)
 
-
-
-
   app.use(
     session({
       name: 'qid',
@@ -79,7 +75,7 @@ const main = async () => {
 
   await apolloServer.start();
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, () => {
     console.log('server started on localhost:4000')
