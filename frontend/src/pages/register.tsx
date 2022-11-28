@@ -22,22 +22,18 @@ const Register: React.FC<registerProps> = ({}) => {
           console.log(values);
         }}
       >
-        {({ values, handleChange }) => (
+        {({ isSubmitting }) => (
           <Form>
-            <InputField
-              name="username"
-              placeholder="username"
-              label="Username"
-            />
+            <InputField name="username" label="Username" />
             <Box mt={4}>
-              <InputField
-                name="password"
-                placeholder="password"
-                label="Password"
-                type="password"
-              />
+              <InputField name="password" label="Password" type="password" />
             </Box>
-            <Button type="submit" color={"teal.800"}>
+            <Button
+              mt={4}
+              type="submit"
+              isLoading={isSubmitting}
+              color={"teal.800"}
+            >
               Register
             </Button>
           </Form>
