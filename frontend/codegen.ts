@@ -1,6 +1,5 @@
 
 import type { CodegenConfig } from '@graphql-codegen/cli';
-import { m } from 'framer-motion';
 
 const config: CodegenConfig = {
   overwrite: true,
