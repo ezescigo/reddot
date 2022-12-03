@@ -45,7 +45,9 @@ const client = createClient({
                 if (result.login.errors) {
                   return query;
                 } else {
-                  return { me: result.login.user };
+                  return {
+                    me: result.login.user,
+                  };
                 }
               }
             );
