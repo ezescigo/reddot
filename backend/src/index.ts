@@ -38,8 +38,8 @@ const main = async () => {
   app.set("trust proxy", 1);
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN,
-      // origin: ['https://studio.apollographql.com', 'http://localhost:3000'],
+      // origin: [process.env.CORS_ORIGIN],
+      origin: process.env.CORS_ORIGIN_GRAPHQL_LOCAL && process.env.CORS_ORIGIN_FRONTEND_LOCAL ? [process.env.CORS_ORIGIN_GRAPHQL_LOCAL, process.env.CORS_ORIGIN_FRONTEND_LOCAL] : 'http://localhost:3000',
       credentials: true,
     })
   );
