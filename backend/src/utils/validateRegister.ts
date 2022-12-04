@@ -1,42 +1,23 @@
 import { UsernamePasswordInput } from "src/resolvers/types/UsernamePasswordInput";
-import { checkEmailInString } from "./checkEmailInString";
+import { validateEmail } from "./validateEmail";
+import { validatePassword } from "./validatePassword";
+import { validateUsername } from "./validateUsername";
 
 export const validateRegister = (options: UsernamePasswordInput) => {
-  if (options.username.length <= 2) {
-    return [
-        {
-          field: 'username',
-          message: 'Username length must be longer than 2 characters.'
-        }
-      ]
+  const emailErrors = validateEmail(options.email);
+  if (emailErrors) {
+    return emailErrors;
   }
 
-  if (checkEmailInString(options.username)) {
-    return [
-        {
-          field: 'username',
-          message: 'Username cannot include @ sign.'
-        }
-      ]
+  const usernameErrors = validateUsername(options.username);
+  if (usernameErrors) {
+    return usernameErrors;
   }
 
-  if (!checkEmailInString(options.email)) {
-    return  [
-        {
-          field: 'email',
-          message: 'Email is not a valid email address.'
-        }
-      ]
-  }
-
-  if (options.password.length <= 2) {
-    return [
-        {
-          field: 'password',
-          message: 'Password length must be longer than 2 characters.'
-        }
-      ]
+  const passwordErrors = validatePassword(options.password);
+  if (passwordErrors) {
+    return passwordErrors;
   }
 
   return null;
-}
+};
