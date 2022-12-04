@@ -2,16 +2,11 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 import theme from "../theme";
 import { AppProps } from "next/app";
-import {
-  createClient,
-  dedupExchange,
-  fetchExchange,
-  Provider,
-  Query,
-} from "urql";
+import { createClient, dedupExchange, fetchExchange, Provider } from "urql";
 import { cacheExchange, Cache, QueryInput } from "@urql/exchange-graphcache";
 import {
   LoginMutation,
+  LogoutMutation,
   MeDocument,
   MeQuery,
   RegisterMutation,
@@ -36,6 +31,14 @@ const client = createClient({
     cacheExchange({
       updates: {
         Mutation: {
+          logout: (_result, args, cache, info) => {
+            typedUpdateQuery<LogoutMutation, MeQuery>(
+              cache,
+              { query: MeDocument },
+              _result,
+              () => ({ me: null })
+            );
+          },
           login: (_result, args, cache, info) => {
             typedUpdateQuery<LoginMutation, MeQuery>(
               cache,
