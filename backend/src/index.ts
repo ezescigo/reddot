@@ -1,7 +1,5 @@
 import "reflect-metadata";
-import { MikroORM } from "@mikro-orm/core";
 import { COOKIE_NAME, __prod__ } from "./constants";
-import mikroOrmConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
@@ -13,12 +11,31 @@ import cors from "cors";
 import Redis from "ioredis";
 import session from "express-session";
 import connectRedis from "connect-redis";
+import { DataSource } from "typeorm";
+import { Post } from "./entities/Post";
+import { User } from "./entities/User";
 
 const main = async () => {
-  // connect DDBB
-  const orm = await MikroORM.init(mikroOrmConfig);
-  // run migrations
-  await orm.getMigrator().up();
+  const conn = new DataSource({
+    type: "postgres",
+    host: "localhost",
+    username: "postgres",
+    password: "saigon3431",
+    database: "libreddot",
+    entities: [Post, User],
+    logging: true,
+    synchronize: true,
+  });
+
+  conn
+    .initialize()
+    .then(() => {
+      console.log("Data Source has been initialized!");
+    })
+    .catch((err) => {
+      console.error("Error during Data Source initialization:", err);
+    });
+
   // run SQL
   // await RequestContext.createAsync(orm.em, async () => {
   //   // Post
@@ -37,15 +54,15 @@ const main = async () => {
   app.set("trust proxy", 1);
   app.use(
     cors({
-      // origin: [process.env.CORS_ORIGIN],
-      origin:
-        process.env.CORS_ORIGIN_GRAPHQL_LOCAL &&
-        process.env.CORS_ORIGIN_FRONTEND_LOCAL
-          ? [
-              process.env.CORS_ORIGIN_GRAPHQL_LOCAL,
-              process.env.CORS_ORIGIN_FRONTEND_LOCAL,
-            ]
-          : "http://localhost:3000",
+      origin: "*",
+      // origin:
+      //   process.env.CORS_ORIGIN_GRAPHQL_LOCAL &&
+      //   process.env.CORS_ORIGIN_FRONTEND_LOCAL
+      //     ? [
+      //         process.env.CORS_ORIGIN_GRAPHQL_LOCAL,
+      //         process.env.CORS_ORIGIN_FRONTEND_LOCAL,
+      //       ]
+      //     : "http://localhost:3000",
       credentials: true,
     })
   );
@@ -77,7 +94,7 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }) => ({ em: orm.em.fork(), req, res, redisClient }), // object accesible by our resolvers.
+    context: ({ req, res }) => ({ req, res, redisClient }), // object accesible by our resolvers.
   });
 
   await apolloServer.start();
