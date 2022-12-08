@@ -1,6 +1,6 @@
 import React from "react";
-import { Box, Button, Flex } from "@chakra-ui/react";
-import NextLink from "next/link";
+import { Box, Button, Flex, Link as ChakraLink } from "@chakra-ui/react";
+import Link from "next/link";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { isServer } from "../utils/isServer";
 
@@ -11,49 +11,32 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   const [{ data, fetching }] = useMeQuery({
     pause: isServer(), //
   });
-  let body = null;
-
-  if (fetching) {
-    // Loading
-  } else if (!data?.me) {
-    // User not logged in
-    body = (
-      <>
-        <NextLink href="/login">
-          <Button variant={"link"} color="white" mr={2}>
-            login
-          </Button>
-        </NextLink>
-        <NextLink href="/register">
-          <Button variant={"link"} color="white">
-            register
-          </Button>
-        </NextLink>
-      </>
-    );
-  } else {
-    // User logged in
-    body = (
-      <>
-        <Flex>
-          <Box mr={2}>{data.me.username}</Box>
-          <Button
-            onClick={() => {
-              logout({});
-            }}
-            isLoading={logoutFetching}
-            variant={"link"}
-          >
-            logout
-          </Button>
-        </Flex>
-      </>
-    );
-  }
 
   return (
-    <Flex bg="tomato" p={4} ml={"auto"}>
-      <Box ml={"auto"}>{body}</Box>
+    <Flex position="sticky" top={0} zIndex={1} bg="tomato" p={4} ml={"auto"}>
+      <Box ml={"auto"}>
+        {!data?.me ? (
+          <>
+            <ChakraLink href="/login">login</ChakraLink>
+            <ChakraLink href="/register">register</ChakraLink>
+          </>
+        ) : (
+          <>
+            <Flex>
+              <Box mr={2}>{data?.me?.username}</Box>
+              <Button
+                onClick={() => {
+                  logout({});
+                }}
+                isLoading={logoutFetching}
+                variant={"link"}
+              >
+                logout
+              </Button>
+            </Flex>
+          </>
+        )}
+      </Box>
     </Flex>
   );
 };

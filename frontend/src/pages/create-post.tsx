@@ -1,24 +1,33 @@
 import { Box, Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { InputField } from "../components/InputField";
-import Wrapper from "../components/Wrapper";
-import { useCreatePostMutation } from "../generated/graphql";
+import { useCreatePostMutation, useMeQuery } from "../generated/graphql";
+import { withUrqlClient } from "next-urql";
+import { createUrqlClient } from "../utils/createUrqlClient";
+import { useRouter } from "next/router";
+import { Layout } from "../components/Layout";
 
-export const CreatePost: React.FC<{}> = ({}) => {
+const CreatePost: React.FC<{}> = ({}) => {
+  const [{ data, fetching }] = useMeQuery();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!fetching && data?.me) {
+      router.replace("/login");
+    }
+  }, [data, router]);
+
   const [, createPost] = useCreatePostMutation();
   return (
-    <Wrapper variant="small">
+    <Layout variant="small">
       <Formik
         initialValues={{ title: "", text: "" }}
-        onSubmit={async (values, { setErrors }) => {
+        onSubmit={async (values) => {
           console.log(values);
-          const response = await createPost({ input: values });
-          if (response.data?.createPost) {
-            // setErrors(toErrorMap(response.data.login.errors));
-            // } else if (response.data?.login.user) {
-            //   // User created
-            //   router.push("/");
+          const { error } = await createPost({ input: values });
+          if (!error) {
+            router.push("/");
           }
         }}
       >
@@ -30,7 +39,12 @@ export const CreatePost: React.FC<{}> = ({}) => {
               label="Post Title"
             />
             <Box mt={4}>
-              <InputField name="text" placeholder="write here!" label="Text" />
+              <InputField
+                name="text"
+                placeholder="write here!"
+                label="Text"
+                textArea
+              />
             </Box>
             <Button
               mt={4}
@@ -43,6 +57,8 @@ export const CreatePost: React.FC<{}> = ({}) => {
           </Form>
         )}
       </Formik>
-    </Wrapper>
+    </Layout>
   );
 };
+
+export default withUrqlClient(createUrqlClient)(CreatePost);
