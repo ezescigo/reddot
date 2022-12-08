@@ -15,7 +15,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "fragment RegularUser on User {\n  id\n  username\n}": types.RegularUserFragmentDoc,
     "mutation ChangePassword($token: String!, $newPassword: String!) {\n  changePassword(token: $token, newPassword: $newPassword) {\n    errors {\n      field\n      message\n    }\n    user {\n      id\n      username\n    }\n  }\n}": types.ChangePasswordDocument,
-    "mutation CreatePost($input: PostInput!) {\n  createPost(input: $input) {\n    title\n    creatorId\n    text\n    points\n  }\n}": types.CreatePostDocument,
+    "mutation CreatePost($input: PostInput!) {\n  createPost(input: $input) {\n    id\n    title\n    creatorId\n    createdAt\n    updatedAt\n    text\n    points\n  }\n}": types.CreatePostDocument,
     "mutation ForgotPassword($email: String!) {\n  forgotPassword(email: $email)\n}": types.ForgotPasswordDocument,
     "mutation Login($usernameOrEmail: String!, $password: String!) {\n  login(usernameOrEmail: $usernameOrEmail, password: $password) {\n    errors {\n      field\n      message\n    }\n    user {\n      id\n      username\n    }\n  }\n}": types.LoginDocument,
     "mutation Logout {\n  logout\n}": types.LogoutDocument,
@@ -35,7 +35,7 @@ export function graphql(source: "mutation ChangePassword($token: String!, $newPa
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "mutation CreatePost($input: PostInput!) {\n  createPost(input: $input) {\n    title\n    creatorId\n    text\n    points\n  }\n}"): (typeof documents)["mutation CreatePost($input: PostInput!) {\n  createPost(input: $input) {\n    title\n    creatorId\n    text\n    points\n  }\n}"];
+export function graphql(source: "mutation CreatePost($input: PostInput!) {\n  createPost(input: $input) {\n    id\n    title\n    creatorId\n    createdAt\n    updatedAt\n    text\n    points\n  }\n}"): (typeof documents)["mutation CreatePost($input: PostInput!) {\n  createPost(input: $input) {\n    id\n    title\n    creatorId\n    createdAt\n    updatedAt\n    text\n    points\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

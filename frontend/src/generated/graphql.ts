@@ -154,8 +154,11 @@ export type CreatePostMutation = {
   __typename?: "Mutation";
   createPost?: {
     __typename?: "Post";
+    id: number;
     title: string;
     creatorId: number;
+    createdAt: string;
+    updatedAt: string;
     text: string;
     points: number;
   } | null;
@@ -262,8 +265,11 @@ export function useChangePasswordMutation() {
 export const CreatePostDocument = gql`
   mutation CreatePost($input: PostInput!) {
     createPost(input: $input) {
+      id
       title
       creatorId
+      createdAt
+      updatedAt
       text
       points
     }

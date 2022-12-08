@@ -1,9 +1,11 @@
 import { Box } from "@chakra-ui/react";
 import React from "react";
 
+export type WrapperVariant = "small" | "regular";
+
 interface WrapperProps {
   children: any;
-  variant?: "small" | "regular";
+  variant?: WrapperVariant;
 }
 
 const Wrapper: React.FunctionComponent<WrapperProps> = ({

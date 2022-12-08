@@ -54,7 +54,8 @@ const main = async () => {
   app.set("trust proxy", 1);
   app.use(
     cors({
-      origin: "*",
+      origin: ["http://localhost:3000", "https://localhost:4000/graphql"],
+      // origin: "*",
       // origin:
       //   process.env.CORS_ORIGIN_GRAPHQL_LOCAL &&
       //   process.env.CORS_ORIGIN_FRONTEND_LOCAL
