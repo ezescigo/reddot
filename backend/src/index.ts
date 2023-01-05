@@ -15,18 +15,18 @@ import { DataSource } from "typeorm";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 
-const main = async () => {
-  const conn = new DataSource({
-    type: "postgres",
-    host: "localhost",
-    username: "postgres",
-    password: "saigon3431",
-    database: "libreddot",
-    entities: [Post, User],
-    logging: true,
-    synchronize: true,
-  });
+export const conn = new DataSource({
+  type: "postgres",
+  host: "localhost",
+  username: "postgres",
+  password: "saigon3431",
+  database: "libreddot",
+  entities: [Post, User],
+  logging: true,
+  synchronize: true,
+});
 
+const main = async () => {
   conn
     .initialize()
     .then(() => {
@@ -54,7 +54,11 @@ const main = async () => {
   app.set("trust proxy", 1);
   app.use(
     cors({
-      origin: ["http://localhost:3000", "https://localhost:4000/graphql"],
+      origin: [
+        "http://localhost:3000",
+        "https://localhost:4000/graphql",
+        "https://studio.apollographql.com",
+      ],
       // origin: "*",
       // origin:
       //   process.env.CORS_ORIGIN_GRAPHQL_LOCAL &&

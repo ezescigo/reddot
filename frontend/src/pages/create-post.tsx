@@ -1,24 +1,19 @@
 import { Box, Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import React, { useEffect } from "react";
-import { InputField } from "../components/InputField";
-import { useCreatePostMutation, useMeQuery } from "../generated/graphql";
 import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 import { useRouter } from "next/router";
+import React from "react";
+import { InputField } from "../components/InputField";
 import { Layout } from "../components/Layout";
+import { useCreatePostMutation } from "../generated/graphql";
+import { createUrqlClient } from "../utils/createUrqlClient";
+import { useIsAuth } from "../utils/useIsAuth";
 
 const CreatePost: React.FC<{}> = ({}) => {
-  const [{ data, fetching }] = useMeQuery();
   const router = useRouter();
-
-  useEffect(() => {
-    if (!fetching && data?.me) {
-      router.replace("/login");
-    }
-  }, [data, router]);
-
+  useIsAuth();
   const [, createPost] = useCreatePostMutation();
+
   return (
     <Layout variant="small">
       <Formik
