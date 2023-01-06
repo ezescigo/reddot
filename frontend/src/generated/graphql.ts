@@ -80,6 +80,7 @@ export type Post = {
   id: Scalars["Float"];
   points: Scalars["Float"];
   text: Scalars["String"];
+  textSnippet: Scalars["String"];
   title: Scalars["String"];
   updatedAt: Scalars["String"];
 };
@@ -238,6 +239,7 @@ export type PostsQuery = {
     __typename?: "Post";
     id: number;
     title: string;
+    textSnippet: string;
     createdAt: string;
     updatedAt: string;
   }>;
@@ -372,6 +374,7 @@ export const PostsDocument = gql`
     posts(limit: $limit, cursor: $cursor) {
       id
       title
+      textSnippet
       createdAt
       updatedAt
     }
