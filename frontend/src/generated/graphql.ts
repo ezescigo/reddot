@@ -101,6 +101,11 @@ export type QueryPostArgs = {
   id: Scalars["Float"];
 };
 
+export type QueryPostsArgs = {
+  cursor?: InputMaybe<Scalars["String"]>;
+  limit: Scalars["Int"];
+};
+
 export type User = {
   __typename?: "User";
   createdAt: Scalars["String"];
@@ -222,7 +227,10 @@ export type MeQuery = {
   me?: { __typename?: "User"; id: number; username: string } | null;
 };
 
-export type PostsQueryVariables = Exact<{ [key: string]: never }>;
+export type PostsQueryVariables = Exact<{
+  limit: Scalars["Int"];
+  cursor?: InputMaybe<Scalars["String"]>;
+}>;
 
 export type PostsQuery = {
   __typename?: "Query";
@@ -360,8 +368,8 @@ export function useMeQuery(
   });
 }
 export const PostsDocument = gql`
-  query Posts {
-    posts {
+  query Posts($limit: Int!, $cursor: String) {
+    posts(limit: $limit, cursor: $cursor) {
       id
       title
       createdAt
@@ -371,7 +379,7 @@ export const PostsDocument = gql`
 `;
 
 export function usePostsQuery(
-  options?: Omit<Urql.UseQueryArgs<PostsQueryVariables>, "query">
+  options: Omit<Urql.UseQueryArgs<PostsQueryVariables>, "query">
 ) {
   return Urql.useQuery<PostsQuery, PostsQueryVariables>({
     query: PostsDocument,
