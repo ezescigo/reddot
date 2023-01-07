@@ -15,7 +15,6 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
 };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
-
 export type Scalars = {
   ID: string;
   String: string;
@@ -73,6 +72,12 @@ export type MutationUpdatePostArgs = {
   title?: InputMaybe<Scalars["String"]>;
 };
 
+export type PaginatedPosts = {
+  __typename?: "PaginatedPosts";
+  hasMore: Scalars["Boolean"];
+  posts: Array<Post>;
+};
+
 export type Post = {
   __typename?: "Post";
   createdAt: Scalars["String"];
@@ -95,7 +100,7 @@ export type Query = {
   hello: Scalars["String"];
   me?: Maybe<User>;
   post?: Maybe<Post>;
-  posts: Array<Post>;
+  posts: PaginatedPosts;
 };
 
 export type QueryPostArgs = {
@@ -235,14 +240,18 @@ export type PostsQueryVariables = Exact<{
 
 export type PostsQuery = {
   __typename?: "Query";
-  posts: Array<{
-    __typename?: "Post";
-    id: number;
-    title: string;
-    textSnippet: string;
-    createdAt: string;
-    updatedAt: string;
-  }>;
+  posts: {
+    __typename?: "PaginatedPosts";
+    hasMore: boolean;
+    posts: Array<{
+      __typename?: "Post";
+      id: number;
+      title: string;
+      textSnippet: string;
+      createdAt: string;
+      updatedAt: string;
+    }>;
+  };
 };
 
 export const RegularUserFragmentDoc = gql`
@@ -372,11 +381,14 @@ export function useMeQuery(
 export const PostsDocument = gql`
   query Posts($limit: Int!, $cursor: String) {
     posts(limit: $limit, cursor: $cursor) {
-      id
-      title
-      textSnippet
-      createdAt
-      updatedAt
+      hasMore
+      posts {
+        id
+        title
+        textSnippet
+        createdAt
+        updatedAt
+      }
     }
   }
 `;

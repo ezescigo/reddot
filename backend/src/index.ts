@@ -35,12 +35,12 @@ const main = async () => {
     .initialize()
     .then(async () => {
       console.log("Data Source has been initialized!");
+      // await Post.delete({});
+      // await conn.runMigrations();
     })
     .catch((err) => {
       console.error("Error during Data Source initialization:", err);
     });
-
-  // await conn.runMigrations();
 
   // run SQL
   // await RequestContext.createAsync(orm.em, async () => {
