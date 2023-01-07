@@ -15,6 +15,8 @@ import { DataSource } from "typeorm";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 
+import path from "path";
+
 export const conn = new DataSource({
   type: "postgres",
   host: "localhost",
@@ -22,15 +24,19 @@ export const conn = new DataSource({
   password: "saigon3431",
   database: "libreddot",
   entities: [Post, User],
+  migrations: [path.join(__dirname, "./migrations/*")],
   logging: true,
   synchronize: true,
 });
 
+// reru
 const main = async () => {
   conn
     .initialize()
-    .then(() => {
+    .then(async () => {
       console.log("Data Source has been initialized!");
+      // await Post.delete({});
+      // await conn.runMigrations();
     })
     .catch((err) => {
       console.error("Error during Data Source initialization:", err);
