@@ -12,6 +12,8 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
     pause: isServer(), //
   });
 
+  console.log("data", data);
+
   return (
     <Flex position="sticky" top={0} zIndex={1} bg="tomato" p={4} ml={"auto"}>
       <Box ml={"auto"}>

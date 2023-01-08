@@ -14,12 +14,14 @@ export class Upvote extends BaseEntity {
   @PrimaryColumn()
   userId: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.upvotes)
   user: User;
 
   @PrimaryColumn()
   postId: number;
 
-  @ManyToOne(() => Post)
+  @ManyToOne(() => Post, (post) => post.upvotes, {
+    onDelete: "CASCADE",
+  })
   post: Post;
 }

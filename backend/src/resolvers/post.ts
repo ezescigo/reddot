@@ -43,6 +43,7 @@ export class PostResolver {
     return root.text.slice(0, 50);
   }
 
+  // Asign a vote (point) to a post
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async vote(
@@ -53,12 +54,15 @@ export class PostResolver {
     const isUpvote = value !== -1;
     const realValue = isUpvote ? 1 : -1;
     const { userId } = req.session;
+
+    // Insert new upvote
     await Upvote.insert({
       userId,
       postId,
       value: realValue,
     });
 
+    // Update Post points
     await getConnection().query(
       `
     update post p

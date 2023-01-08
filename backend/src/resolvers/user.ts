@@ -38,6 +38,7 @@ class UserResponse {
 
 @Resolver(User)
 export class UserResolver {
+  // This resolver will "filter out" queries: field email is "private".
   @FieldResolver(() => String)
   email(@Root() user: User, @Ctx() { req }: MyContext) {
     if (req.session.userId === user.id) {
@@ -51,6 +52,7 @@ export class UserResolver {
   @Query(() => User, { nullable: true })
   async me(@Ctx() { req }: MyContext) {
     // Not logged in
+    console.log("*********************************req", req.session);
     if (!req.session.userId) {
       return null;
     }
@@ -125,7 +127,7 @@ export class UserResolver {
     }
 
     req.session.userId = user.id;
-
+    console.log("***************************after login: ", req.session);
     return {
       user,
     };
