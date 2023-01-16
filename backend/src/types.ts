@@ -12,4 +12,4 @@ export type MyContext = {
   redisClient: Redis;
 };
 
-export type SessionWithUser = Session & Partial<Session> & { userId?: number };
+export type SessionWithUser = Session & { userId: number };

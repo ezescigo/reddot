@@ -16,6 +16,7 @@ import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 
 import path from "path";
+import { Upvote } from "./entities/Upvote";
 
 export const conn = new DataSource({
   type: "postgres",
@@ -23,7 +24,7 @@ export const conn = new DataSource({
   username: "postgres",
   password: "saigon3431",
   database: "libreddot",
-  entities: [Post, User],
+  entities: [Post, User, Upvote],
   migrations: [path.join(__dirname, "./migrations/*")],
   logging: true,
   synchronize: true,
@@ -62,18 +63,9 @@ const main = async () => {
     cors({
       origin: [
         "http://localhost:3000",
-        "https://localhost:4000/graphql",
+        "http://localhost:4000/graphql",
         "https://studio.apollographql.com",
       ],
-      // origin: "*",
-      // origin:
-      //   process.env.CORS_ORIGIN_GRAPHQL_LOCAL &&
-      //   process.env.CORS_ORIGIN_FRONTEND_LOCAL
-      //     ? [
-      //         process.env.CORS_ORIGIN_GRAPHQL_LOCAL,
-      //         process.env.CORS_ORIGIN_FRONTEND_LOCAL,
-      //       ]
-      //     : "http://localhost:3000",
       credentials: true,
     })
   );
@@ -110,7 +102,21 @@ const main = async () => {
 
   await apolloServer.start();
 
-  apolloServer.applyMiddleware({ app, cors: false });
+  // apolloServer.applyMiddleware({
+  //   app,
+  //   // cors: { origin: "http://localhost:3000", credentials: true },
+  //   cors: {
+  //     origin: "http://localhost:3000",
+  //     // process.env.CORS_ORIGIN_FRONTEND,
+  //     // "https://studio.apollographql.com",
+  //     credentials: true,
+  //   },
+  // });
+
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
 
   app.listen(4000, () => {
     console.log("server started on localhost:4000");

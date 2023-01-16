@@ -14,7 +14,7 @@ interface Variables {
 
 const Index = () => {
   const [variables, setVariables] = useState<Variables>({
-    limit: 33,
+    limit: 15,
     cursor: null,
   });
   const [{ data, fetching }] = usePostsQuery({
@@ -39,7 +39,13 @@ const Index = () => {
         {!data && fetching
           ? null
           : data!.posts.posts.map((p) => (
-              <Card key={p.id} title={p.title} desc={`${p.textSnippet}...`} />
+              <Card
+                key={p.id}
+                title={p.title}
+                creator={p.creator}
+                upvotes={p.points}
+                desc={`${p.textSnippet}...`}
+              />
             ))}
       </Stack>
       <Flex>
