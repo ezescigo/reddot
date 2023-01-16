@@ -21,7 +21,7 @@ import { v4 } from "uuid";
 import { validatePassword } from "../utils/validatePassword";
 
 @ObjectType()
-class FieldError {
+export class FieldError {
   @Field()
   field: string;
   @Field()
@@ -52,7 +52,6 @@ export class UserResolver {
   @Query(() => User, { nullable: true })
   async me(@Ctx() { req }: MyContext) {
     // Not logged in
-    console.log("*********************************req", req.session);
     if (!req.session.userId) {
       return null;
     }
@@ -127,7 +126,6 @@ export class UserResolver {
     }
 
     req.session.userId = user.id;
-    console.log("***************************after login: ", req.session);
     return {
       user,
     };

@@ -15,12 +15,19 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
 };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
+
 export type Scalars = {
   ID: string;
   String: string;
   Boolean: boolean;
   Int: number;
   Float: number;
+};
+
+export type ErrorResponse = {
+  __typename?: "ErrorResponse";
+  field: Scalars["String"];
+  message: Scalars["String"];
 };
 
 export type FieldError = {
@@ -39,6 +46,7 @@ export type Mutation = {
   logout?: Maybe<Scalars["Boolean"]>;
   register: UserResponse;
   updatePost?: Maybe<Post>;
+  vote: PostResponse;
 };
 
 export type MutationChangePasswordArgs = {
@@ -72,6 +80,11 @@ export type MutationUpdatePostArgs = {
   title?: InputMaybe<Scalars["String"]>;
 };
 
+export type MutationVoteArgs = {
+  postId: Scalars["Int"];
+  value: Scalars["Int"];
+};
+
 export type PaginatedPosts = {
   __typename?: "PaginatedPosts";
   hasMore: Scalars["Boolean"];
@@ -81,6 +94,7 @@ export type PaginatedPosts = {
 export type Post = {
   __typename?: "Post";
   createdAt: Scalars["String"];
+  creator: User;
   creatorId: Scalars["Float"];
   id: Scalars["Float"];
   points: Scalars["Float"];
@@ -93,6 +107,13 @@ export type Post = {
 export type PostInput = {
   text: Scalars["String"];
   title: Scalars["String"];
+};
+
+export type PostResponse = {
+  __typename?: "PostResponse";
+  errors?: Maybe<Array<ErrorResponse>>;
+  post?: Maybe<Post>;
+  success: Scalars["Boolean"];
 };
 
 export type Query = {
@@ -226,6 +247,24 @@ export type RegisterMutation = {
   };
 };
 
+export type VoteMutationVariables = Exact<{
+  value: Scalars["Int"];
+  postId: Scalars["Int"];
+}>;
+
+export type VoteMutation = {
+  __typename?: "Mutation";
+  vote: {
+    __typename?: "PostResponse";
+    success: boolean;
+    errors?: Array<{
+      __typename?: "ErrorResponse";
+      field: string;
+      message: string;
+    }> | null;
+  };
+};
+
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = {
@@ -248,8 +287,10 @@ export type PostsQuery = {
       id: number;
       title: string;
       textSnippet: string;
+      points: number;
       createdAt: string;
       updatedAt: string;
+      creator: { __typename?: "User"; id: number; username: string };
     }>;
   };
 };
@@ -361,6 +402,21 @@ export function useRegisterMutation() {
     RegisterDocument
   );
 }
+export const VoteDocument = gql`
+  mutation vote($value: Int!, $postId: Int!) {
+    vote(value: $value, postId: $postId) {
+      success
+      errors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export function useVoteMutation() {
+  return Urql.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument);
+}
 export const MeDocument = gql`
   query Me {
     me {
@@ -386,8 +442,14 @@ export const PostsDocument = gql`
         id
         title
         textSnippet
+        points
         createdAt
         updatedAt
+        points
+        creator {
+          id
+          username
+        }
       }
     }
   }

@@ -17,7 +17,26 @@ import { MyContext } from "../types";
 import { isAuth } from "../middleware/isAuth";
 import { conn } from "../";
 import { Upvote } from "../entities/Upvote";
-import { getConnection } from "typeorm";
+
+@ObjectType()
+export class ErrorResponse {
+  @Field()
+  field: string;
+  @Field()
+  message: string;
+}
+
+@ObjectType()
+class PostResponse {
+  @Field(() => [ErrorResponse], { nullable: true })
+  errors?: ErrorResponse[];
+
+  @Field(() => Post, { nullable: true })
+  post?: Post;
+
+  @Field()
+  success: boolean;
+}
 
 @InputType()
 class PostInput {
@@ -44,33 +63,56 @@ export class PostResolver {
   }
 
   // Asign a vote (point) to a post
-  @Mutation(() => Boolean)
-  @UseMiddleware(isAuth)
+  @Mutation(() => PostResponse)
+  // @UseMiddleware(isAuth)
   async vote(
     @Arg("postId", () => Int) postId: number,
     @Arg("value", () => Int) value: number,
     @Ctx() { req }: MyContext
-  ) {
+  ): Promise<PostResponse> {
+    console.log("req.session", req.session);
+    // const { userId } = req.session;
+    const userId = 1;
+
+    const upvoteExists = await Upvote.findOneBy({ userId, postId: postId });
+    if (upvoteExists) {
+      return {
+        success: false,
+        errors: [
+          {
+            field: "upvote",
+            message: "User has already upvoted this post.",
+          },
+        ],
+      };
+    }
+
     const isUpvote = value !== -1;
     const realValue = isUpvote ? 1 : -1;
-    const { userId } = req.session;
 
     // Insert new upvote
-    await Upvote.insert({
-      userId,
-      postId,
-      value: realValue,
-    });
+    // await Upvote.insert({
+    //   userId,
+    //   postId,
+    //   value: realValue,
+    // });
 
     // Update Post points
-    await getConnection().query(
+    await conn.query(
       `
-    update post p
-    set p.points = p.points + $1
-    where p.id = $2`,
-      [realValue, postId]
+      START TRANSACTION;
+
+      insert into upvote ("userId", "postId", value)
+      values (${userId},${postId},${realValue});
+
+      update post
+      set points = points + ${realValue}
+      where id = ${postId};
+
+      COMMIT;
+      `
     );
-    return true;
+    return { success: true };
   }
 
   @Query(() => PaginatedPosts)
@@ -94,6 +136,22 @@ export class PostResolver {
     }
 
     const posts = await queryBuilder.getMany();
+
+    // const replacements: any[] = [realLimitPlusOne];
+
+    // if (cursor) {
+    //   replacements.push(new Date(parseInt(cursor)));
+    // }
+
+    // const posts = await conn.getRepository(Post).query(
+    //   `
+    // select p.*
+    // from post p
+    // ${cursor ? `where p."createdAt" < ${new Date(parseInt(cursor))}` : ""}
+    // order by p."createdAt" DESC
+    // limit ${realLimitPlusOne}
+    // `
+    // );
 
     return {
       posts: posts.slice(0, realLimit),

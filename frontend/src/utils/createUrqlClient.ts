@@ -32,7 +32,6 @@ const cursorPagination = (): Resolver => {
     const { parentKey: entityKey, fieldName } = info;
 
     const allFields = cache.inspectFields(entityKey);
-    console.log("allFields", allFields);
     const fieldInfos = allFields.filter((info) => info.fieldName === fieldName);
     const size = fieldInfos.length;
     if (size === 0) {
@@ -50,7 +49,6 @@ const cursorPagination = (): Resolver => {
     const results: string[] = [];
     let hasMore = true;
     fieldInfos.forEach((fi) => {
-      console.log("fi: ", fi);
       const key = cache.resolveFieldByKey(entityKey, fi.fieldKey) as string;
       const data = cache.resolve(key, "posts") as string[];
       const _hasMore = cache.resolve(key, "hasMore") ? true : false;
@@ -87,6 +85,16 @@ export const createUrqlClient = (ssrExchange: any) => ({
       },
       updates: {
         Mutation: {
+          createPost: (_result, args, cache, info) => {
+            // We invalidate the cache and refetch posts from the server, to avoid race conditions and have a fresh posts list.
+            const allFields = cache.inspectFields("Query");
+            const fieldInfos = allFields.filter(
+              (info) => info.fieldName === "posts"
+            );
+            fieldInfos.forEach((fieldInfo) => {
+              cache.invalidate("Query", "posts", fieldInfo.arguments);
+            });
+          },
           logout: (_result, args, cache, info) => {
             typedUpdateQuery<LogoutMutation, MeQuery>(
               cache,
