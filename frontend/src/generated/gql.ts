@@ -13,6 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel-plugin for production.
  */
 const documents = {
+    "fragment Post on Post {\n  id\n  title\n  textSnippet\n  points\n  createdAt\n  updatedAt\n  points\n  creator {\n    id\n    username\n  }\n}": types.PostFragmentDoc,
     "fragment RegularUser on User {\n  id\n  username\n}": types.RegularUserFragmentDoc,
     "mutation ChangePassword($token: String!, $newPassword: String!) {\n  changePassword(token: $token, newPassword: $newPassword) {\n    errors {\n      field\n      message\n    }\n    user {\n      id\n      username\n    }\n  }\n}": types.ChangePasswordDocument,
     "mutation CreatePost($input: PostInput!) {\n  createPost(input: $input) {\n    id\n    title\n    creatorId\n    createdAt\n    updatedAt\n    text\n    points\n  }\n}": types.CreatePostDocument,
@@ -25,6 +26,10 @@ const documents = {
     "query Posts($limit: Int!, $cursor: String) {\n  posts(limit: $limit, cursor: $cursor) {\n    hasMore\n    posts {\n      id\n      title\n      textSnippet\n      points\n      createdAt\n      updatedAt\n      points\n      creator {\n        id\n        username\n      }\n    }\n  }\n}": types.PostsDocument,
 };
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "fragment Post on Post {\n  id\n  title\n  textSnippet\n  points\n  createdAt\n  updatedAt\n  points\n  creator {\n    id\n    username\n  }\n}"): (typeof documents)["fragment Post on Post {\n  id\n  title\n  textSnippet\n  points\n  createdAt\n  updatedAt\n  points\n  creator {\n    id\n    username\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

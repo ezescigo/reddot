@@ -1,34 +1,27 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { PostsQuery } from "../generated/graphql";
+import { VotesSection } from "./VotesSection";
 
 export interface User {
   id: number;
   username: string;
 }
 export interface CardProps {
-  title: string;
-  desc: string;
-  upvotes: number;
-  creator: User;
+  // Cant make Fragments to work (urqlClient doesnt inffer Query data type (Post) correctly)
+  post: PostsQuery["posts"]["posts"][0];
 }
 
-export const Card: React.FC<CardProps> = ({
-  title,
-  desc,
-  creator,
-  upvotes,
-  ...rest
-}) => {
+export const Card: React.FC<CardProps> = ({ post }) => {
   return (
-    <Box p={5} shadow="md" borderWidth="1px" {...rest}>
-      <Heading fontSize="xl">{title}</Heading> {`by ${creator.username}`}
-      <Flex direction="column">
+    <Flex p={5} direction="row" shadow="md" borderWidth="1px">
+      <VotesSection postId={post.id} points={post.points} />
+      <Box mt={3}>
+        <Heading fontSize="xl">{post.title}</Heading>{" "}
+        {`by ${post.creator.username}`}
         <Box mt={4} mb={2}>
-          <Text>{desc}</Text>
+          <Text>{`${post.textSnippet}...`}</Text>
         </Box>
-        <Box mt={1} ml="auto">
-          <Text>{`Likes: ${upvotes}`}</Text>
-        </Box>
-      </Flex>
-    </Box>
+      </Box>
+    </Flex>
   );
 };
