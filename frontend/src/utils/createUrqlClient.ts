@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
 import { dedupExchange, fetchExchange, stringifyVariables } from "urql";
 import {
@@ -85,6 +86,16 @@ export const createUrqlClient = (ssrExchange: any) => ({
       },
       updates: {
         Mutation: {
+          vote: (_result, args, cache, info) => {
+            // We invalidate the cache and refetch posts from the server, to avoid race conditions and have a fresh posts list.
+            const allFields = cache.inspectFields("Query");
+            const fieldInfos = allFields.filter(
+              (info) => info.fieldName === "posts"
+            );
+            fieldInfos.forEach((fieldInfo) => {
+              cache.invalidate("Query", "posts", fieldInfo.arguments);
+            });
+          },
           createPost: (_result, args, cache, info) => {
             // We invalidate the cache and refetch posts from the server, to avoid race conditions and have a fresh posts list.
             const allFields = cache.inspectFields("Query");

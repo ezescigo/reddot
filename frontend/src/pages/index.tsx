@@ -41,10 +41,11 @@ const Index = () => {
           : data!.posts.posts.map((p) => (
               <Card
                 key={p.id}
-                title={p.title}
-                creator={p.creator}
-                upvotes={p.points}
-                desc={`${p.textSnippet}...`}
+                post={p}
+                // title={p.title}
+                // creator={p.creator}
+                // upvotes={p.points}
+                // desc={`${p.textSnippet}...`}
               />
             ))}
       </Stack>

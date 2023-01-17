@@ -71,24 +71,38 @@ export class PostResolver {
     @Ctx() { req }: MyContext
   ): Promise<PostResponse> {
     console.log("req.session", req.session);
-    // const { userId } = req.session;
-    const userId = 1;
-
-    const upvoteExists = await Upvote.findOneBy({ userId, postId: postId });
-    if (upvoteExists) {
+    const { userId } = req.session;
+    // const userId = 1;
+    const isUpvote = value !== -1;
+    const realValue = isUpvote ? 1 : -1;
+    const vote = await Upvote.findOneBy({ userId, postId: postId });
+    console.log(vote);
+    if (vote && vote.value === realValue) {
       return {
         success: false,
         errors: [
           {
             field: "upvote",
-            message: "User has already upvoted this post.",
+            message: "User has already voted this post.",
           },
         ],
       };
     }
 
-    const isUpvote = value !== -1;
-    const realValue = isUpvote ? 1 : -1;
+    if (vote) {
+      try {
+        await Upvote.update({ postId, userId }, { value: realValue });
+        const post = await Post.findOneBy({ id: postId });
+        const updatedPoints = (post?.points ?? 0) + realValue * 2;
+        await Post.update({ id: postId }, { points: updatedPoints });
+        return { success: true };
+      } catch (err) {
+        return {
+          success: false,
+          errors: [{ message: "Internal Server Error.", field: "" }],
+        };
+      }
+    }
 
     // Insert new upvote
     // await Upvote.insert({
@@ -98,21 +112,24 @@ export class PostResolver {
     // });
 
     // Update Post points
-    await conn.query(
-      `
-      START TRANSACTION;
+    try {
+      await conn.transaction(async (tm) => {
+        await tm.query(`
+        insert into upvote ("userId", "postId", value)
+        values (${userId},${postId},${realValue})
+        `);
 
-      insert into upvote ("userId", "postId", value)
-      values (${userId},${postId},${realValue});
-
-      update post
-      set points = points + ${realValue}
-      where id = ${postId};
-
-      COMMIT;
-      `
-    );
-    return { success: true };
+        await tm.query(`update post
+        set points = points + ${realValue}
+        where id = ${postId}`);
+      });
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        errors: [{ message: "Internal Server Error.", field: "" }],
+      };
+    }
   }
 
   @Query(() => PaginatedPosts)

@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 import gql from "graphql-tag";
 import * as Urql from "urql";
 export type Maybe<T> = T | null;
@@ -154,6 +153,17 @@ export type UsernamePasswordInput = {
   username: Scalars["String"];
 };
 
+export type PostFragment = {
+  __typename?: "Post";
+  id: number;
+  title: string;
+  textSnippet: string;
+  points: number;
+  createdAt: string;
+  updatedAt: string;
+  creator: { __typename?: "User"; id: number; username: string };
+} & { " $fragmentName"?: "PostFragment" };
+
 export type RegularUserFragment = {
   __typename?: "User";
   id: number;
@@ -295,6 +305,21 @@ export type PostsQuery = {
   };
 };
 
+export const PostFragmentDoc = gql`
+  fragment Post on Post {
+    id
+    title
+    textSnippet
+    points
+    createdAt
+    updatedAt
+    points
+    creator {
+      id
+      username
+    }
+  }
+`;
 export const RegularUserFragmentDoc = gql`
   fragment RegularUser on User {
     id
