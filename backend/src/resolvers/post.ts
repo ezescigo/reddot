@@ -135,14 +135,39 @@ export class PostResolver {
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
-    @Arg("cursor", () => String, { nullable: true }) cursor: string | null // Date
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null, // Date
+    @Ctx() { req }: MyContext
   ): Promise<PaginatedPosts> {
+    const { userId } = req.session;
     const realLimit = Math.min(50, limit); // Asked
     const realLimitPlusOne = realLimit + 1; // Query check for limit asked + 1, so we can tell if there's more posts to show in a future query or not.
+
+    // const subQueryVotes = conn
+    //   .getRepository(Upvote)
+    //   .createQueryBuilder("v")
+    //   .select('v.value')
+    //   .where(`v."userId" = ${userId} AND v."postId" = }`)
+
     const queryBuilder = conn
       .getRepository(Post)
       .createQueryBuilder("p")
+      // .leftJoinAndSelect(
+      //   (qb) => qb.select("value").from(Upvote, "v").where(""),
+      //   "voteStatus",
+      // `"voteStatus"."userId" = ${
+      //   userId ?? 1
+      // } AND "voteStatus"."postId" = p.id`
+      // )
+      .select(
+        (qb) =>
+          qb
+            .select("value")
+            .from(Upvote, "v")
+            .where(`"userId" = ${2 ?? 0} AND "postId" = p.id`),
+        "voteStatus"
+      )
       .innerJoinAndSelect("p.creator", "u", 'u.id = p."creatorId"')
+
       .orderBy("p.createdAt", "DESC")
       .take(realLimitPlusOne);
 
@@ -153,7 +178,7 @@ export class PostResolver {
     }
 
     const posts = await queryBuilder.getMany();
-
+    console.log(posts);
     // const replacements: any[] = [realLimitPlusOne];
 
     // if (cursor) {

@@ -12,12 +12,10 @@ export const VotesSection: React.FC<VotesSectionProps> = ({
   postId,
   points,
 }) => {
-  const [{ fetching, operation }, vote] = useVoteMutation();
+  const [, vote] = useVoteMutation();
   const [voteLoading, setVoteLoading] = useState<
     "up-loading" | "down-loading" | "not-loading"
   >("not-loading");
-  console.log("opertation", operation);
-  console.log("fetching", fetching);
   return (
     <Flex
       direction="column"
