@@ -135,40 +135,79 @@ export class PostResolver {
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
-    @Arg("cursor", () => String, { nullable: true }) cursor: string | null // Date
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null, // Date
+    @Ctx() { req }: MyContext
   ): Promise<PaginatedPosts> {
     const realLimit = Math.min(50, limit); // Asked
     const realLimitPlusOne = realLimit + 1; // Query check for limit asked + 1, so we can tell if there's more posts to show in a future query or not.
-    const queryBuilder = conn
-      .getRepository(Post)
-      .createQueryBuilder("p")
-      .innerJoinAndSelect("p.creator", "u", 'u.id = p."creatorId"')
-      .orderBy("p.createdAt", "DESC")
-      .take(realLimitPlusOne);
 
-    if (cursor) {
-      queryBuilder.where("p.createdAt < :cursor", {
-        cursor: new Date(parseInt(cursor)),
-      });
-    }
+    // .getMany is bugged: select returns []. Can't use the queryBuilder, so to avoid doing 2 querys and mapping or using getRawMany, we will give the raw SQL query and use getMany (with entities).
+    // const queryBuilder = conn
+    //   .getRepository(Post)
+    //   .createQueryBuilder("p")
+    //   // .leftJoinAndSelect(
+    //   //   (qb) => qb.select("value").from(Upvote, "v").where(""),
+    //   //   "voteStatus",
+    //   // `"voteStatus"."userId" = ${
+    //   //   userId ?? 1
+    //   // } AND "voteStatus"."postId" = p.id`
+    //   // )
+    //   .select(
+    //     (qb) =>
+    //       qb
+    //         .select("value")
+    //         .from(Upvote, "v")
+    //         .where(`"userId" = ${2 ?? 0} AND "postId" = p.id`),
+    //     "voteStatus"
+    //   )
+    //   .innerJoinAndSelect("p.creator", "u", 'u.id = p."creatorId"')
 
-    const posts = await queryBuilder.getMany();
-
-    // const replacements: any[] = [realLimitPlusOne];
+    //   .orderBy("p.createdAt", "DESC")
+    //   .take(realLimitPlusOne);
 
     // if (cursor) {
-    //   replacements.push(new Date(parseInt(cursor)));
+    //   queryBuilder.where("p.createdAt < :cursor", {
+    //     cursor: new Date(parseInt(cursor)),
+    //   });
     // }
 
-    // const posts = await conn.getRepository(Post).query(
-    //   `
-    // select p.*
-    // from post p
-    // ${cursor ? `where p."createdAt" < ${new Date(parseInt(cursor))}` : ""}
-    // order by p."createdAt" DESC
-    // limit ${realLimitPlusOne}
-    // `
-    // );
+    // const posts = await queryBuilder.getMany();
+
+    const replacements: any[] = [realLimitPlusOne];
+
+    if (req.session.userId) {
+      replacements.push(req.session.userId);
+    }
+
+    let cursorIdx = 3;
+    if (cursor) {
+      replacements.push(new Date(parseInt(cursor)));
+      cursorIdx = replacements.length;
+    }
+
+    const posts = await conn.query(
+      `
+      select p.*,
+      json_build_object(
+        'id', u.id,
+        'username', u.username,
+        'email', u.email,
+        'createdAt', u."createdAt",
+        'updatedAt', u."updatedAt"
+        ) creator,
+        ${
+          req.session.userId
+            ? '(select value from upvote where "userId" = $2 and "postId" = p.id) "voteStatus"'
+            : 'null as "voteStatus"'
+        }
+        from post p
+        inner join public.user u on u.id = p."creatorId"
+        ${cursor ? `where p."createdAt" < $${cursorIdx}` : ""}
+        order by p."createdAt" DESC
+        limit $1
+      `,
+      replacements
+    );
 
     return {
       posts: posts.slice(0, realLimit),

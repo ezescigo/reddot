@@ -12,9 +12,14 @@ export interface CardProps {
 }
 
 export const Card: React.FC<CardProps> = ({ post }) => {
+  console.log(post);
   return (
     <Flex p={5} direction="row" shadow="md" borderWidth="1px">
-      <VotesSection postId={post.id} points={post.points} />
+      <VotesSection
+        postId={post.id}
+        points={post.points}
+        voteStatus={post.voteStatus}
+      />
       <Box mt={3}>
         <Heading fontSize="xl">{post.title}</Heading>{" "}
         {`by ${post.creator.username}`}

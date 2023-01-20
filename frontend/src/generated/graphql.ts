@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 import gql from "graphql-tag";
 import * as Urql from "urql";
 export type Maybe<T> = T | null;
@@ -101,6 +102,7 @@ export type Post = {
   textSnippet: Scalars["String"];
   title: Scalars["String"];
   updatedAt: Scalars["String"];
+  voteStatus?: Maybe<Scalars["Int"]>;
 };
 
 export type PostInput = {
@@ -297,6 +299,7 @@ export type PostsQuery = {
       id: number;
       title: string;
       textSnippet: string;
+      voteStatus?: number | null;
       points: number;
       createdAt: string;
       updatedAt: string;
@@ -467,6 +470,7 @@ export const PostsDocument = gql`
         id
         title
         textSnippet
+        voteStatus
         points
         createdAt
         updatedAt
