@@ -6,11 +6,13 @@ import { useVoteMutation } from "../generated/graphql";
 interface VotesSectionProps {
   postId: number;
   points: number;
+  voteStatus?: number | null;
 }
 
 export const VotesSection: React.FC<VotesSectionProps> = ({
   postId,
   points,
+  voteStatus,
 }) => {
   const [, vote] = useVoteMutation();
   const [voteLoading, setVoteLoading] = useState<
@@ -33,7 +35,8 @@ export const VotesSection: React.FC<VotesSectionProps> = ({
           setVoteLoading("not-loading");
         }}
         isLoading={voteLoading === "up-loading"}
-        variant="ghost"
+        variant="solid"
+        colorScheme={voteStatus === 1 ? "green" : undefined}
         aria-label="Upvote post"
         icon={<ArrowUpIcon boxSize={5} />}
       />
@@ -50,7 +53,8 @@ export const VotesSection: React.FC<VotesSectionProps> = ({
           setVoteLoading("not-loading");
         }}
         isLoading={voteLoading === "down-loading"}
-        variant="ghost"
+        variant="solid"
+        colorScheme={voteStatus === -1 ? "red" : undefined}
         aria-label="Downvote post"
         icon={<ArrowDownIcon boxSize={5} />}
       />
