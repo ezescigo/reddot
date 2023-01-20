@@ -2,7 +2,7 @@ import { Box, Button, Flex, Heading, Stack } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import { useState } from "react";
-import { Card } from "../components/Card";
+import { PostCard } from "../components/PostCard";
 import { Layout } from "../components/Layout";
 import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
@@ -39,7 +39,7 @@ const Index = () => {
         {!data && fetching
           ? null
           : data!.posts.posts.map((p) => (
-              <Card
+              <PostCard
                 key={p.id}
                 post={p}
                 // title={p.title}

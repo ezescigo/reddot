@@ -1,4 +1,5 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { PostsQuery } from "../generated/graphql";
 import { VotesSection } from "./VotesSection";
 
@@ -6,15 +7,31 @@ export interface User {
   id: number;
   username: string;
 }
+
+export interface Creator {
+  __typename?: "User" | undefined;
+  id: number;
+  username: string;
+}
+
 export interface CardProps {
   // Cant make Fragments to work (urqlClient doesnt inffer Query data type (Post) correctly)
   post: PostsQuery["posts"]["posts"][0];
 }
 
-export const Card: React.FC<CardProps> = ({ post }) => {
-  console.log(post);
+export const PostCard: React.FC<CardProps> = ({ post }) => {
+  const router = useRouter();
+  // console.log(post);
   return (
-    <Flex p={5} direction="row" shadow="md" borderWidth="1px">
+    <Flex
+      p={5}
+      direction="row"
+      shadow="md"
+      borderWidth="1px"
+      onClick={() => {
+        router.push(`/post/${post.id}`);
+      }}
+    >
       <VotesSection
         postId={post.id}
         points={post.points}
