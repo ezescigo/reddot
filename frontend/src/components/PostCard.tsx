@@ -1,13 +1,15 @@
+import { DeleteIcon } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
   Heading,
+  IconButton,
   LinkBox,
   LinkOverlay,
   Text,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { PostsQuery } from "../generated/graphql";
+import { PostsQuery, useDeletePostMutation } from "../generated/graphql";
 import { VotesSection } from "./VotesSection";
 
 export interface User {
@@ -28,6 +30,7 @@ export interface CardProps {
 
 export const PostCard: React.FC<CardProps> = ({ post }) => {
   const router = useRouter();
+  const [, deletePost] = useDeletePostMutation();
   // console.log(post);
   return (
     <Flex p={5} direction="row" shadow="md" borderWidth="1px">
@@ -36,15 +39,26 @@ export const PostCard: React.FC<CardProps> = ({ post }) => {
         points={post.points}
         voteStatus={post.voteStatus}
       />
-      <LinkBox as="article" rounded="md" mt={3}>
+      <LinkBox as="article" rounded="md" flex={1} mt={3}>
         <LinkOverlay href={`/post/${post.id}`}>
           <Heading fontSize="xl">{post.title}</Heading>{" "}
           {`by ${post.creator.username}`}
-          <Box mt={4} mb={2}>
-            <Text>{`${post.textSnippet}...`}</Text>
-          </Box>
+          <Flex>
+            <Box mt={4} mb={2}>
+              <Text>{`${post.textSnippet}...`}</Text>
+            </Box>
+          </Flex>
         </LinkOverlay>
       </LinkBox>
+      <Box>
+        <IconButton
+          icon={<DeleteIcon />}
+          aria-label="Delete Post"
+          variant="link"
+          color="red.600"
+          onClick={() => deletePost({ id: post.id })}
+        />
+      </Box>
     </Flex>
   );
 };
