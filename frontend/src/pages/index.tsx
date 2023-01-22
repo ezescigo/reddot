@@ -2,7 +2,7 @@ import { Box, Button, Flex, Heading, Stack } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import { useState } from "react";
-import { Card } from "../components/Card";
+import { PostCard } from "../components/PostCard";
 import { Layout } from "../components/Layout";
 import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
@@ -27,19 +27,11 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex mb={4}>
-        <Heading>Reddot</Heading>
-        <Box ml="auto">
-          <NextLink href="/create-post">
-            <Button colorScheme="purple">Create Post</Button>
-          </NextLink>
-        </Box>
-      </Flex>
       <Stack spacing={8} direction="column">
         {!data && fetching
           ? null
           : data!.posts.posts.map((p) => (
-              <Card
+              <PostCard
                 key={p.id}
                 post={p}
                 // title={p.title}

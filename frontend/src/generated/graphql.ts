@@ -59,7 +59,7 @@ export type MutationCreatePostArgs = {
 };
 
 export type MutationDeletePostArgs = {
-  id: Scalars["Float"];
+  id: Scalars["Int"];
 };
 
 export type MutationForgotPasswordArgs = {
@@ -76,7 +76,7 @@ export type MutationRegisterArgs = {
 };
 
 export type MutationUpdatePostArgs = {
-  id: Scalars["Float"];
+  id: Scalars["Int"];
   title?: InputMaybe<Scalars["String"]>;
 };
 
@@ -126,7 +126,7 @@ export type Query = {
 };
 
 export type QueryPostArgs = {
-  id: Scalars["Float"];
+  id: Scalars["Int"];
 };
 
 export type QueryPostsArgs = {
@@ -282,6 +282,33 @@ export type MeQueryVariables = Exact<{ [key: string]: never }>;
 export type MeQuery = {
   __typename?: "Query";
   me?: { __typename?: "User"; id: number; username: string } | null;
+};
+
+export type PostQueryVariables = Exact<{
+  id: Scalars["Int"];
+}>;
+
+export type PostQuery = {
+  __typename?: "Query";
+  post?: {
+    __typename?: "Post";
+    id: number;
+    title: string;
+    textSnippet: string;
+    points: number;
+    createdAt: string;
+    updatedAt: string;
+    creatorId: number;
+    voteStatus?: number | null;
+    creator: {
+      __typename?: "User";
+      id: number;
+      email: string;
+      username: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+  } | null;
 };
 
 export type PostsQueryVariables = Exact<{
@@ -459,6 +486,36 @@ export function useMeQuery(
 ) {
   return Urql.useQuery<MeQuery, MeQueryVariables>({
     query: MeDocument,
+    ...options,
+  });
+}
+export const PostDocument = gql`
+  query Post($id: Int!) {
+    post(id: $id) {
+      id
+      title
+      textSnippet
+      points
+      createdAt
+      updatedAt
+      creatorId
+      voteStatus
+      creator {
+        id
+        email
+        username
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+
+export function usePostQuery(
+  options: Omit<Urql.UseQueryArgs<PostQueryVariables>, "query">
+) {
+  return Urql.useQuery<PostQuery, PostQueryVariables>({
+    query: PostDocument,
     ...options,
   });
 }
