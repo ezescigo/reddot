@@ -27,14 +27,6 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex mb={4}>
-        <Heading>Reddot</Heading>
-        <Box ml="auto">
-          <NextLink href="/create-post">
-            <Button colorScheme="purple">Create Post</Button>
-          </NextLink>
-        </Box>
-      </Flex>
       <Stack spacing={8} direction="column">
         {!data && fetching
           ? null

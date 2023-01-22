@@ -1,4 +1,11 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  LinkBox,
+  LinkOverlay,
+  Text,
+} from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { PostsQuery } from "../generated/graphql";
 import { VotesSection } from "./VotesSection";
@@ -23,27 +30,21 @@ export const PostCard: React.FC<CardProps> = ({ post }) => {
   const router = useRouter();
   // console.log(post);
   return (
-    <Flex
-      p={5}
-      direction="row"
-      shadow="md"
-      borderWidth="1px"
-      onClick={() => {
-        router.push(`/post/${post.id}`);
-      }}
-    >
+    <Flex p={5} direction="row" shadow="md" borderWidth="1px">
       <VotesSection
         postId={post.id}
         points={post.points}
         voteStatus={post.voteStatus}
       />
-      <Box mt={3}>
-        <Heading fontSize="xl">{post.title}</Heading>{" "}
-        {`by ${post.creator.username}`}
-        <Box mt={4} mb={2}>
-          <Text>{`${post.textSnippet}...`}</Text>
-        </Box>
-      </Box>
+      <LinkBox as="article" rounded="md" mt={3}>
+        <LinkOverlay href={`/post/${post.id}`}>
+          <Heading fontSize="xl">{post.title}</Heading>{" "}
+          {`by ${post.creator.username}`}
+          <Box mt={4} mb={2}>
+            <Text>{`${post.textSnippet}...`}</Text>
+          </Box>
+        </LinkOverlay>
+      </LinkBox>
     </Flex>
   );
 };

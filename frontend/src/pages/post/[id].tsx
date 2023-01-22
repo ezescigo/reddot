@@ -1,3 +1,4 @@
+import { Box } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
@@ -12,24 +13,42 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = () => {
   const router = useRouter();
-  // console.log(router)
-  console.log(router.query);
   const id =
     typeof router.query.id === "string" ? parseInt(router.query!.id!) : 0;
-  const [{ data, fetching }] = usePostQuery({
+  const [{ data, fetching, error }] = usePostQuery({
     pause: id === 0,
     variables: { id },
   });
 
   console.log(data);
 
-  if (fetching || !data?.post) {
-    <Layout>loading</Layout>;
+  if (fetching) {
+    return (
+      <Layout>
+        <Box>loading</Box>
+      </Layout>
+    );
   }
-  // return "asd";
+
+  if (error) {
+    return (
+      <Layout>
+        <Box>error</Box>
+      </Layout>
+    );
+  }
+
+  if (!data?.post) {
+    return (
+      <Layout>
+        <Box>Cannot find post</Box>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <PostCard key={id} post={data?.post!} />
+      <PostCard key={id} post={data.post} />
     </Layout>
   );
 };
