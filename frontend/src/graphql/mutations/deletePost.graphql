@@ -1,0 +1,9 @@
+mutation DeletePost($id: Int!) {
+  deletePost(id: $id) {
+    success
+    errors {
+      field
+      message
+    }
+  }
+}

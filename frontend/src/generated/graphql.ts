@@ -40,7 +40,7 @@ export type Mutation = {
   __typename?: "Mutation";
   changePassword: UserResponse;
   createPost?: Maybe<Post>;
-  deletePost?: Maybe<Scalars["Boolean"]>;
+  deletePost?: Maybe<PostResponse>;
   forgotPassword: Scalars["Boolean"];
   login: UserResponse;
   logout?: Maybe<Scalars["Boolean"]>;
@@ -208,6 +208,23 @@ export type CreatePostMutation = {
   } | null;
 };
 
+export type DeletePostMutationVariables = Exact<{
+  id: Scalars["Int"];
+}>;
+
+export type DeletePostMutation = {
+  __typename?: "Mutation";
+  deletePost?: {
+    __typename?: "PostResponse";
+    success: boolean;
+    errors?: Array<{
+      __typename?: "ErrorResponse";
+      field: string;
+      message: string;
+    }> | null;
+  } | null;
+};
+
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars["String"];
 }>;
@@ -294,8 +311,8 @@ export type PostQuery = {
     __typename?: "Post";
     id: number;
     title: string;
-    textSnippet: string;
     points: number;
+    text: string;
     createdAt: string;
     updatedAt: string;
     creatorId: number;
@@ -396,6 +413,23 @@ export function useCreatePostMutation() {
     CreatePostDocument
   );
 }
+export const DeletePostDocument = gql`
+  mutation DeletePost($id: Int!) {
+    deletePost(id: $id) {
+      success
+      errors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export function useDeletePostMutation() {
+  return Urql.useMutation<DeletePostMutation, DeletePostMutationVariables>(
+    DeletePostDocument
+  );
+}
 export const ForgotPasswordDocument = gql`
   mutation ForgotPassword($email: String!) {
     forgotPassword(email: $email)
@@ -494,8 +528,8 @@ export const PostDocument = gql`
     post(id: $id) {
       id
       title
-      textSnippet
       points
+      text
       createdAt
       updatedAt
       creatorId

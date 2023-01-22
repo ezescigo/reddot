@@ -253,13 +253,30 @@ export class PostResolver {
     return post;
   }
 
-  @Mutation(() => Boolean, { nullable: true })
-  async deletePost(@Arg("id", () => Int) id: number): Promise<boolean> {
-    try {
-      await Post.delete(id);
-      return true;
-    } catch {
-      return false;
+  @Mutation(() => PostResponse, { nullable: true })
+  @UseMiddleware(isAuth)
+  async deletePost(
+    @Arg("id", () => Int) id: number,
+    @Ctx() { req }: MyContext
+  ): Promise<PostResponse> {
+    const post = await Post.findOne({ where: { id } });
+    if (!post) {
+      return {
+        success: false,
+        errors: [{ field: "", message: "Post does not exist." }],
+      };
     }
+
+    if (post.creatorId !== req.session.userId) {
+      return {
+        success: false,
+        errors: [
+          { field: "", message: "You can only delete posts that you created." },
+        ],
+      };
+    }
+    await Upvote.delete({ postId: id });
+    await Post.delete({ id, creatorId: req.session.userId });
+    return { success: true };
   }
 }
