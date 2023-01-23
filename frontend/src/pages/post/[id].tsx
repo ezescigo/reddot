@@ -1,24 +1,17 @@
 import { Box } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
-import { useRouter } from "next/router";
 import React from "react";
 import { Layout } from "../../components/Layout";
-import { PostCard } from "../../components/PostCard";
-import { usePostQuery } from "../../generated/graphql";
+import { PostItem } from "../../components/PostItem";
 import { createUrqlClient } from "../../utils/createUrqlClient";
+import { useGetPostFromURL } from "../../utils/useGetPostFromURL";
 
 interface PostProps {
   // id: number;
 }
 
 const Post: React.FC<PostProps> = () => {
-  const router = useRouter();
-  const id =
-    typeof router.query.id === "string" ? parseInt(router.query!.id!) : 0;
-  const [{ data, fetching, error }] = usePostQuery({
-    pause: id === 0,
-    variables: { id },
-  });
+  const [{ data, fetching, error }] = useGetPostFromURL();
 
   console.log(data);
 
@@ -48,7 +41,7 @@ const Post: React.FC<PostProps> = () => {
 
   return (
     <Layout>
-      <PostCard key={id} post={data.post} />
+      <PostItem key={data.post.id} post={data.post} />
     </Layout>
   );
 };

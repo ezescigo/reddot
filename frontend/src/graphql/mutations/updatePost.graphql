@@ -1,0 +1,15 @@
+mutation UpdatePost($updatePostId: Int!, $title: String!, $text: String!) {
+  updatePost(id: $updatePostId, title: $title, text: $text) {
+    success
+    post {
+      id
+      title
+      text
+      textSnippet
+    }
+    errors {
+      field
+      message
+    }
+  }
+}
