@@ -3,6 +3,7 @@ import { withUrqlClient } from "next-urql";
 import React from "react";
 import { Layout } from "../../components/Layout";
 import { PostItem } from "../../components/PostItem";
+import { useMeQuery } from "../../generated/graphql";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 import { useGetPostFromURL } from "../../utils/useGetPostFromURL";
 
@@ -11,6 +12,7 @@ interface PostProps {
 }
 
 const Post: React.FC<PostProps> = () => {
+  const [{ data: meData }] = useMeQuery();
   const [{ data, fetching, error }] = useGetPostFromURL();
 
   console.log(data);
@@ -41,7 +43,12 @@ const Post: React.FC<PostProps> = () => {
 
   return (
     <Layout>
-      <PostItem key={data.post.id} post={data.post} />
+      <PostItem
+        key={data.post.id}
+        post={data.post}
+        canDelete={data.post.creator.id === meData?.me?.id}
+        canEdit={data.post.creator.id === meData?.me?.id}
+      />
     </Layout>
   );
 };

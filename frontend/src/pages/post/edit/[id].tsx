@@ -21,7 +21,6 @@ const EditPost: React.FC<EditPostProps> = ({}) => {
     variables: { id: postId },
   });
   const [, updatePost] = useUpdatePostMutation();
-  console.log(data);
 
   if (fetching) {
     return (
@@ -57,7 +56,7 @@ const EditPost: React.FC<EditPostProps> = ({}) => {
             title: values.title,
             text: values.text,
           });
-          router.push("/");
+          router.back();
         }}
       >
         {({ isSubmitting }) => (
