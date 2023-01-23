@@ -238,19 +238,59 @@ export class PostResolver {
     return Post.create({ ...input, creatorId: req.session.userId }).save();
   }
 
-  @Mutation(() => Post, { nullable: true })
+  @Mutation(() => PostResponse)
+  @UseMiddleware(isAuth)
   async updatePost(
     @Arg("id", () => Int) id: number,
-    @Arg("title", () => String, { nullable: true }) title: string
-  ): Promise<Post | null> {
+    @Arg("title") title: string,
+    @Arg("text") text: string,
+    @Ctx() { req }: MyContext
+  ): Promise<PostResponse> {
     const post = await Post.findOneBy({ id });
     if (!post) {
-      return null;
+      return {
+        success: false,
+        errors: [{ field: "", message: "Post does not exist." }],
+      };
     }
-    if (typeof title !== "undefined") {
-      await Post.update({ id }, { title });
+
+    // Only Post Owner can modify it
+    if (post.creatorId !== req.session.userId) {
+      return {
+        success: false,
+        errors: [
+          { field: "", message: "You can only delete posts that you own." },
+        ],
+      };
     }
-    return post;
+
+    // await Post.update({ id, creatorId: req.session.userId }, { title, text });
+
+    // We use QueryBuilder method to have the updated Post response.
+    const response = await conn
+      .createQueryBuilder()
+      .update(Post)
+      .set({ title, text })
+      .where('id = :id and "creatorId"= :creatorId', {
+        id,
+        creatorId: req.session.userId,
+      })
+      .returning("*")
+      .execute();
+
+    if (response.affected === 0) {
+      return {
+        success: false,
+        errors: [{ field: "", message: "Post could not be modified." }],
+      };
+    }
+
+    const updatedPost = response.raw[0];
+
+    return {
+      success: true,
+      post: updatedPost,
+    };
   }
 
   @Mutation(() => PostResponse, { nullable: true })
@@ -271,7 +311,7 @@ export class PostResolver {
       return {
         success: false,
         errors: [
-          { field: "", message: "You can only delete posts that you created." },
+          { field: "", message: "You can only delete posts that you own." },
         ],
       };
     }

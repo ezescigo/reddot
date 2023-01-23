@@ -4,6 +4,7 @@ query Post($id: Int!) {
     title
     points
     text
+    textSnippet
     createdAt
     updatedAt
     creatorId

@@ -1,10 +1,16 @@
-import { Box, Button, Flex, Heading, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  LinkBox,
+  LinkOverlay,
+  Stack,
+} from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
-import NextLink from "next/link";
 import { useState } from "react";
-import { PostCard } from "../components/PostCard";
 import { Layout } from "../components/Layout";
-import { usePostsQuery } from "../generated/graphql";
+import { PostItem } from "../components/PostItem";
+import { useMeQuery, usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 interface Variables {
@@ -21,6 +27,8 @@ const Index = () => {
     variables,
   });
 
+  const [{ data: meData }] = useMeQuery();
+
   if (!fetching && !data) {
     return <div>There's been an error loading posts.</div>;
   }
@@ -31,14 +39,23 @@ const Index = () => {
         {!data && fetching
           ? null
           : data!.posts.posts.map((p) => (
-              <PostCard
-                key={p.id}
-                post={p}
-                // title={p.title}
-                // creator={p.creator}
-                // upvotes={p.points}
-                // desc={`${p.textSnippet}...`}
-              />
+              <Box
+                _hover={{
+                  boxShadow:
+                    "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;",
+                }}
+              >
+                <PostItem
+                  key={p.id}
+                  post={p}
+                  canDelete={p.creator.id === meData?.me?.id}
+                  canEdit={p.creator.id === meData?.me?.id}
+                  // title={p.title}
+                  // creator={p.creator}
+                  // upvotes={p.points}
+                  // desc={`${p.textSnippet}...`}
+                />
+              </Box>
             ))}
       </Stack>
       <Flex>
