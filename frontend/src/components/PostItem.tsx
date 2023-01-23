@@ -1,13 +1,5 @@
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  Flex,
-  Heading,
-  IconButton,
-  LinkBox,
-  LinkOverlay,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Flex, Heading, IconButton, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { PostsQuery, useDeletePostMutation } from "../generated/graphql";

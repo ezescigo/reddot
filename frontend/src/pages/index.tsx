@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  LinkBox,
-  LinkOverlay,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Stack } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import { useState } from "react";
 import { Layout } from "../components/Layout";

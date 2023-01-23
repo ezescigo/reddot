@@ -1,7 +1,7 @@
 import { Box, Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
-import { Router, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import React from "react";
 import { InputField } from "../../../components/InputField";
 import { Layout } from "../../../components/Layout";
@@ -11,7 +11,6 @@ import {
 } from "../../../generated/graphql";
 import { createUrqlClient } from "../../../utils/createUrqlClient";
 import { useGetId } from "../../../utils/useGetId";
-import { useGetPostFromURL } from "../../../utils/useGetPostFromURL";
 
 interface EditPostProps {}
 
