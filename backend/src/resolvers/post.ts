@@ -17,6 +17,7 @@ import { MyContext } from "../types";
 import { isAuth } from "../middleware/isAuth";
 import { conn } from "../";
 import { Upvote } from "../entities/Upvote";
+import { User } from "../entities/User";
 
 @ObjectType()
 export class ErrorResponse {
@@ -62,74 +63,10 @@ export class PostResolver {
     return root.text.slice(0, 50);
   }
 
-  // Asign a vote (point) to a post
-  @Mutation(() => PostResponse)
-  // @UseMiddleware(isAuth)
-  async vote(
-    @Arg("postId", () => Int) postId: number,
-    @Arg("value", () => Int) value: number,
-    @Ctx() { req }: MyContext
-  ): Promise<PostResponse> {
-    console.log("req.session", req.session);
-    const { userId } = req.session;
-    // const userId = 1;
-    const isUpvote = value !== -1;
-    const realValue = isUpvote ? 1 : -1;
-    const vote = await Upvote.findOneBy({ userId, postId: postId });
-    console.log(vote);
-    if (vote && vote.value === realValue) {
-      return {
-        success: false,
-        errors: [
-          {
-            field: "upvote",
-            message: "User has already voted this post.",
-          },
-        ],
-      };
-    }
-
-    if (vote) {
-      try {
-        await Upvote.update({ postId, userId }, { value: realValue });
-        const post = await Post.findOneBy({ id: postId });
-        const updatedPoints = (post?.points ?? 0) + realValue * 2;
-        await Post.update({ id: postId }, { points: updatedPoints });
-        return { success: true };
-      } catch (err) {
-        return {
-          success: false,
-          errors: [{ message: "Internal Server Error.", field: "" }],
-        };
-      }
-    }
-
-    // Insert new upvote
-    // await Upvote.insert({
-    //   userId,
-    //   postId,
-    //   value: realValue,
-    // });
-
-    // Update Post points
-    try {
-      await conn.transaction(async (tm) => {
-        await tm.query(`
-        insert into upvote ("userId", "postId", value)
-        values (${userId},${postId},${realValue})
-        `);
-
-        await tm.query(`update post
-        set points = points + ${realValue}
-        where id = ${postId}`);
-      });
-      return { success: true };
-    } catch (err) {
-      return {
-        success: false,
-        errors: [{ message: "Internal Server Error.", field: "" }],
-      };
-    }
+  @FieldResolver(() => User)
+  creator(@Root() post: Post, @Ctx() { userLoader }: MyContext) {
+    return User.findOne({ where: { id: post.creatorId } });
+    // return userLoader.load(post.id);
   }
 
   @Query(() => PaginatedPosts)
@@ -143,7 +80,7 @@ export class PostResolver {
 
     // .getMany is bugged: select returns []. Can't use the queryBuilder, so to avoid doing 2 querys and mapping or using getRawMany, we will give the raw SQL query and use getMany (with entities).
     // const queryBuilder = conn
-    //   .getRepository(Post)
+    // .getRepository(Post)
     //   .createQueryBuilder("p")
     //   // .leftJoinAndSelect(
     //   //   (qb) => qb.select("value").from(Upvote, "v").where(""),
@@ -188,20 +125,12 @@ export class PostResolver {
     const posts = await conn.query(
       `
       select p.*,
-      json_build_object(
-        'id', u.id,
-        'username', u.username,
-        'email', u.email,
-        'createdAt', u."createdAt",
-        'updatedAt', u."updatedAt"
-        ) creator,
         ${
           req.session.userId
             ? '(select value from upvote where "userId" = $2 and "postId" = p.id) "voteStatus"'
             : 'null as "voteStatus"'
         }
         from post p
-        inner join public.user u on u.id = p."creatorId"
         ${cursor ? `where p."createdAt" < $${cursorIdx}` : ""}
         order by p."createdAt" DESC
         limit $1
@@ -226,7 +155,7 @@ export class PostResolver {
 
     // return post;
 
-    return Post.findOne({ where: { id }, relations: ["creator"] });
+    return Post.findOne({ where: { id } });
   }
 
   @Mutation(() => Post, { nullable: true })
@@ -318,5 +247,75 @@ export class PostResolver {
     await Upvote.delete({ postId: id });
     await Post.delete({ id, creatorId: req.session.userId });
     return { success: true };
+  }
+
+  // Asign a vote (point) to a post
+  @Mutation(() => PostResponse)
+  // @UseMiddleware(isAuth)
+  async vote(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() { req }: MyContext
+  ): Promise<PostResponse> {
+    console.log("req.session", req.session);
+    const { userId } = req.session;
+    // const userId = 1;
+    const isUpvote = value !== -1;
+    const realValue = isUpvote ? 1 : -1;
+    const vote = await Upvote.findOneBy({ userId, postId: postId });
+    console.log(vote);
+    if (vote && vote.value === realValue) {
+      return {
+        success: false,
+        errors: [
+          {
+            field: "upvote",
+            message: "User has already voted this post.",
+          },
+        ],
+      };
+    }
+
+    if (vote) {
+      try {
+        await Upvote.update({ postId, userId }, { value: realValue });
+        const post = await Post.findOneBy({ id: postId });
+        const updatedPoints = (post?.points ?? 0) + realValue * 2;
+        await Post.update({ id: postId }, { points: updatedPoints });
+        return { success: true };
+      } catch (err) {
+        return {
+          success: false,
+          errors: [{ message: "Internal Server Error.", field: "" }],
+        };
+      }
+    }
+
+    // Insert new upvote
+    // await Upvote.insert({
+    //   userId,
+    //   postId,
+    //   value: realValue,
+    // });
+
+    // Update Post points
+    try {
+      await conn.transaction(async (tm) => {
+        await tm.query(`
+          insert into upvote ("userId", "postId", value)
+          values (${userId},${postId},${realValue})
+          `);
+
+        await tm.query(`update post
+          set points = points + ${realValue}
+          where id = ${postId}`);
+      });
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        errors: [{ message: "Internal Server Error.", field: "" }],
+      };
+    }
   }
 }

@@ -97,6 +97,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
         },
         updates: {
           Mutation: {
+            // UpdatePost is not necessary because the API returns the Post object and typeorm will update the cache for us.
             deletePost: (_result, args, cache, info) => {
               // We invalidate the cache and refetch posts from the server
               cache.invalidate({

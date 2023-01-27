@@ -15,8 +15,6 @@ const Post: React.FC<PostProps> = () => {
   const [{ data: meData }] = useMeQuery();
   const [{ data, fetching, error }] = useGetPostFromURL();
 
-  console.log(data);
-
   if (fetching) {
     return (
       <Layout>
