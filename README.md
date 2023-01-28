@@ -1,5 +1,5 @@
 # reddot
-project simil Reddit
+Project simil Reddit
 Backend: Express, GraphQL, Apollo Server, TypeORM, Redis, PostgreSQL.
 Frontend: NextJS, React, Typescript, GraphQL, URQL, ChakraUI, Formik.
 
