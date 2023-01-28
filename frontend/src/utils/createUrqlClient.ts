@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
+import { cacheExchange, Resolver, Cache } from "@urql/exchange-graphcache";
 import { dedupExchange, fetchExchange, gql, stringifyVariables } from "urql";
 import {
   DeletePostMutation,
@@ -70,6 +70,14 @@ const cursorPagination = (): Resolver => {
       posts: results,
     };
   };
+};
+
+const invalidateAllPosts = (cache: Cache) => {
+  const allFields = cache.inspectFields("Query");
+  const fieldInfos = allFields.filter((info) => info.fieldName === "posts");
+  fieldInfos.forEach((fieldInfo) => {
+    cache.invalidate("Query", "posts", fieldInfo.arguments);
+  });
 };
 
 export const createUrqlClient = (ssrExchange: any, ctx: any) => {
@@ -146,13 +154,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
             },
             createPost: (_result, args, cache, info) => {
               // We invalidate the cache and refetch posts from the server, to avoid race conditions and have a fresh posts list.
-              const allFields = cache.inspectFields("Query");
-              const fieldInfos = allFields.filter(
-                (info) => info.fieldName === "posts"
-              );
-              fieldInfos.forEach((fieldInfo) => {
-                cache.invalidate("Query", "posts", fieldInfo.arguments);
-              });
+              invalidateAllPosts(cache);
             },
             logout: (_result, args, cache, info) => {
               typedUpdateQuery<LogoutMutation, MeQuery>(
@@ -177,6 +179,8 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
                   }
                 }
               );
+              // We invalidate the cache and refetch posts from the server, to avoid race conditions and have a fresh posts list.
+              // invalidateAllPosts(cache);
             },
             register: (_result, args, cache, info) => {
               typedUpdateQuery<RegisterMutation, MeQuery>(
