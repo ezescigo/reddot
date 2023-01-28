@@ -9,6 +9,7 @@ Features so far:
   <li>Register</li>
   <li>Login</li>
   <li>Logout</li>
+  <li>Auth / Cookies</li>
   <li>CreatePost</li>
   <li>UpdatePost</li>
   <li>DeletePost</li>
