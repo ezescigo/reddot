@@ -18,6 +18,7 @@ import { User } from "./entities/User";
 import path from "path";
 import { Upvote } from "./entities/Upvote";
 import { createUserLoader } from "./utils/createUserLoader";
+import { createVoteStatusLoader } from "./utils/createVoteStatusLoader";
 
 export const conn = new DataSource({
   type: "postgres",
@@ -105,7 +106,8 @@ const main = async () => {
       req,
       res,
       redisClient,
-      userLoader: createUserLoader,
+      userLoader: createUserLoader(),
+      voteStatusLoader: createVoteStatusLoader(),
     }), // object accesible by our resolvers.
   });
 

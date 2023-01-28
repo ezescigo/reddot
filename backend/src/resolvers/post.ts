@@ -65,15 +65,32 @@ export class PostResolver {
 
   @FieldResolver(() => User)
   creator(@Root() post: Post, @Ctx() { userLoader }: MyContext) {
-    return User.findOne({ where: { id: post.creatorId } });
-    // return userLoader.load(post.id);
+    // return User.findOne({ where: { id: post.creatorId } });
+    return userLoader.load(post.creatorId);
+  }
+
+  @FieldResolver(() => Int, { nullable: true })
+  async voteStatus(
+    @Root() post: Post,
+    @Ctx() { req, voteStatusLoader }: MyContext
+  ) {
+    if (!req.session.userId) {
+      return null;
+    }
+
+    const upvote = await voteStatusLoader.load({
+      postId: post.id,
+      userId: req.session.userId,
+    });
+
+    return upvote ? upvote.value : null;
   }
 
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
-    @Arg("cursor", () => String, { nullable: true }) cursor: string | null, // Date
-    @Ctx() { req }: MyContext
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null // Date
+    // @Ctx() { req }: MyContext
   ): Promise<PaginatedPosts> {
     const realLimit = Math.min(50, limit); // Asked
     const realLimitPlusOne = realLimit + 1; // Query check for limit asked + 1, so we can tell if there's more posts to show in a future query or not.
@@ -112,26 +129,19 @@ export class PostResolver {
 
     const replacements: any[] = [realLimitPlusOne];
 
-    if (req.session.userId) {
-      replacements.push(req.session.userId);
-    }
+    // if (req.session.userId) {
+    //   replacements.push(req.session.userId);
+    // }
 
-    let cursorIdx = 3;
     if (cursor) {
       replacements.push(new Date(parseInt(cursor)));
-      cursorIdx = replacements.length;
     }
 
     const posts = await conn.query(
       `
-      select p.*,
-        ${
-          req.session.userId
-            ? '(select value from upvote where "userId" = $2 and "postId" = p.id) "voteStatus"'
-            : 'null as "voteStatus"'
-        }
+      select p.*
         from post p
-        ${cursor ? `where p."createdAt" < $${cursorIdx}` : ""}
+        ${cursor ? `where p."createdAt" < $2` : ""}
         order by p."createdAt" DESC
         limit $1
       `,
