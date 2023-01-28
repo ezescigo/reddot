@@ -17,6 +17,8 @@ import { User } from "./entities/User";
 
 import path from "path";
 import { Upvote } from "./entities/Upvote";
+import { createUserLoader } from "./utils/createUserLoader";
+import { createVoteStatusLoader } from "./utils/createVoteStatusLoader";
 
 export const conn = new DataSource({
   type: "postgres",
@@ -83,6 +85,9 @@ const main = async () => {
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365,
         httpOnly: true,
+        // Config for studio.apollographql:
+        // sameSite: "none",
+        // secure: true,
         sameSite: "lax", // csrf
         secure: __prod__, // cookie only works in https
       },
@@ -97,20 +102,25 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }) => ({ req, res, redisClient }), // object accesible by our resolvers.
+    context: ({ req, res }) => ({
+      req,
+      res,
+      redisClient,
+      userLoader: createUserLoader(),
+      voteStatusLoader: createVoteStatusLoader(),
+    }), // object accesible by our resolvers.
   });
 
   await apolloServer.start();
 
+  // Cookies to work on studio.apollographql:
+
   // apolloServer.applyMiddleware({
   //   app,
-  //   // cors: { origin: "http://localhost:3000", credentials: true },
-  //   cors: {
-  //     origin: "http://localhost:3000",
-  //     // process.env.CORS_ORIGIN_FRONTEND,
-  //     // "https://studio.apollographql.com",
-  //     credentials: true,
-  //   },
+  //   // cors: {
+  //   //   origin: ["http://localhost:3000", "https://studio.apollographql.com"],
+  //   //   credentials: true,
+  //   // }
   // });
 
   apolloServer.applyMiddleware({

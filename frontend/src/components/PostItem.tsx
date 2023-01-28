@@ -55,7 +55,6 @@ export const PostItem: React.FC<PostItemProps> = ({
             icon={<EditIcon />}
             aria-label="Edit Post"
             variant="link"
-            zIndex={2}
             onClick={() => router.push(`/post/edit/${post.id}`)}
           />
         )}
@@ -65,7 +64,6 @@ export const PostItem: React.FC<PostItemProps> = ({
             aria-label="Delete Post"
             variant="link"
             color="red.600"
-            zIndex={2}
             onClick={() => deletePost({ id: post.id })}
           />
         )}
