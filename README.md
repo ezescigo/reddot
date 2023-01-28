@@ -5,12 +5,14 @@ Frontend: NextJS, React, Typescript, GraphQL, URQL, ChakraUI, Formik.
 
 Features so far:
 
-Register
-Login
-Logout
-CreatePost
-UpdatePost
-DeletePost
-VotePost (+1 or -1)
-Cache
-Pagination
+<ul>
+  <li>Register</li>
+  <li>Login</li>
+  <li>Logout</li>
+  <li>CreatePost</li>
+  <li>UpdatePost</li>
+  <li>DeletePost</li>
+  <li>VotePost (+1 or -1)</li>
+  <li>Cache</li>
+  <li>Pagination</li>
+</ul>
