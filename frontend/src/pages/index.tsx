@@ -2,6 +2,7 @@ import { Box, Button, Flex, Stack } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import { useState } from "react";
 import { Layout } from "../components/Layout";
+import NewPost from "../components/NewPost";
 import { PostItem } from "../components/PostItem";
 import { useMeQuery, usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
@@ -34,6 +35,7 @@ const Index = () => {
   return (
     <Layout>
       <Stack spacing={8} direction="column">
+        <NewPost />
         {!data && fetching
           ? null
           : data!.posts.posts.map((p) => (
