@@ -24,11 +24,11 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
           <Heading>Reddot</Heading>
         </ChakraLink>
         <Flex ml="auto" align={"center"}>
-          <Box ml="auto" mr={2}>
+          {/* <Box ml="auto" mr={2}>
             <Link href="/create-post">
               <Button colorScheme="purple">Create Post</Button>
             </Link>
-          </Box>
+          </Box> */}
           {!data?.me ? (
             <>
               <Box mr={2}>
