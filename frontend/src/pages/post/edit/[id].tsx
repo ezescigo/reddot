@@ -1,33 +1,30 @@
-import { Box, Button } from "@chakra-ui/react";
-import { Form, Formik } from "formik";
-import { withUrqlClient } from "next-urql";
-import { useRouter } from "next/router";
-import React from "react";
-import { InputField } from "../../../components/InputField";
-import { Layout } from "../../../components/Layout";
-import {
-  usePostQuery,
-  useUpdatePostMutation,
-} from "../../../generated/graphql";
-import { createUrqlClient } from "../../../utils/createUrqlClient";
-import { useGetId } from "../../../utils/useGetId";
+import { Box, Button } from "@chakra-ui/react"
+import { Form, Formik } from "formik"
+import { withUrqlClient } from "next-urql"
+import { useRouter } from "next/router"
+import React from "react"
+import { InputField } from "../../../components/InputField"
+import { Layout } from "../../../app/layout"
+import { usePostQuery, useUpdatePostMutation } from "../../../generated/graphql"
+import { createUrqlClient } from "../../../utils/createUrqlClient"
+import { useGetId } from "../../../utils/useGetId"
 
 interface EditPostProps {}
 
 const EditPost: React.FC<EditPostProps> = ({}) => {
-  const router = useRouter();
-  const postId = useGetId();
+  const router = useRouter()
+  const postId = useGetId()
   const [{ data, fetching, error }] = usePostQuery({
     variables: { id: postId },
-  });
-  const [, updatePost] = useUpdatePostMutation();
+  })
+  const [, updatePost] = useUpdatePostMutation()
 
   if (fetching) {
     return (
       <Layout>
         <Box>loading</Box>
       </Layout>
-    );
+    )
   }
 
   if (error) {
@@ -35,7 +32,7 @@ const EditPost: React.FC<EditPostProps> = ({}) => {
       <Layout>
         <Box>error</Box>
       </Layout>
-    );
+    )
   }
 
   if (!data?.post) {
@@ -43,7 +40,7 @@ const EditPost: React.FC<EditPostProps> = ({}) => {
       <Layout>
         <Box>Cannot find post</Box>
       </Layout>
-    );
+    )
   }
 
   return (
@@ -55,38 +52,24 @@ const EditPost: React.FC<EditPostProps> = ({}) => {
             updatePostId: postId,
             title: values.title,
             text: values.text,
-          });
-          router.back();
+          })
+          router.back()
         }}
       >
         {({ isSubmitting }) => (
           <Form>
-            <InputField
-              name="title"
-              placeholder="Post Title"
-              label="Post Title"
-            />
+            <InputField name="title" placeholder="Post Title" label="Post Title" />
             <Box mt={4}>
-              <InputField
-                name="text"
-                placeholder="write here!"
-                label="Text"
-                textArea
-              />
+              <InputField name="text" placeholder="write here!" label="Text" textArea />
             </Box>
-            <Button
-              mt={4}
-              type="submit"
-              isLoading={isSubmitting}
-              color={"teal.800"}
-            >
+            <Button mt={4} type="submit" isLoading={isSubmitting} color={"teal.800"}>
               Save
             </Button>
           </Form>
         )}
       </Formik>
     </Layout>
-  );
-};
+  )
+}
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(EditPost);
+export default withUrqlClient(createUrqlClient, { ssr: true })(EditPost)

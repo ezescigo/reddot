@@ -269,11 +269,13 @@ export class PostResolver {
   ): Promise<PostResponse> {
     console.log("req.session", req.session);
     const { userId } = req.session;
-    // const userId = 1;
-    const isUpvote = value !== -1;
-    const realValue = isUpvote ? 1 : -1;
+    // Value 0: delete vote
+    // Value 1: upvote
+    // Value -1: downvote
+
+    // const isUpvote = value === 1
+    const realValue = value;
     const vote = await Upvote.findOneBy({ userId, postId: postId });
-    console.log(vote);
     if (vote && vote.value === realValue) {
       return {
         success: false,
@@ -286,11 +288,15 @@ export class PostResolver {
       };
     }
 
-    if (vote) {
+    // If value is 0, delete vote and update Post points
+    if (realValue === 0 && vote) {
       try {
-        await Upvote.update({ postId, userId }, { value: realValue });
+        await Upvote.delete({ postId, userId });
         const post = await Post.findOneBy({ id: postId });
-        const updatedPoints = (post?.points ?? 0) + realValue * 2;
+
+        // If user had Upvoted, we remove their vote from post. If user had downvoted, we add their vote to post.
+        const addOrRemoveVote = vote.value === 1 ? -1 : 1;
+        const updatedPoints = (post?.points ?? 0) + addOrRemoveVote;
         await Post.update({ id: postId }, { points: updatedPoints });
         return { success: true };
       } catch (err) {
@@ -301,14 +307,23 @@ export class PostResolver {
       }
     }
 
-    // Insert new upvote
-    // await Upvote.insert({
-    //   userId,
-    //   postId,
-    //   value: realValue,
-    // });
+    // If vote exists and value != 0, update it
+    if (vote) {
+      try {
+        await Upvote.update({ postId, userId }, { value: realValue });
+        const post = await Post.findOneBy({ id: postId });
+        const updatedPoints = (post?.points ?? 0) + realValue;
+        await Post.update({ id: postId }, { points: updatedPoints });
+        return { success: true };
+      } catch (err) {
+        return {
+          success: false,
+          errors: [{ message: "Internal Server Error.", field: "" }],
+        };
+      }
+    }
 
-    // Update Post points
+    // If vote does not exists, create it
     try {
       await conn.transaction(async (tm) => {
         await tm.query(`
@@ -327,5 +342,62 @@ export class PostResolver {
         errors: [{ message: "Internal Server Error.", field: "" }],
       };
     }
+
+    // const isUpvote = value !== -1;
+    // const realValue = isUpvote ? 1 : -1;
+    // const vote = await Upvote.findOneBy({ userId, postId: postId });
+    // if (vote && vote.value === realValue) {
+    //   return {
+    //     success: false,
+    //     errors: [
+    //       {
+    //         field: "upvote",
+    //         message: "User has already voted this post.",
+    //       },
+    //     ],
+    //   };
+    // }
+
+    // if (vote) {
+    //   try {
+    //     await Upvote.update({ postId, userId }, { value: realValue });
+    //     const post = await Post.findOneBy({ id: postId });
+    //     const updatedPoints = (post?.points ?? 0) + realValue * 2;
+    //     await Post.update({ id: postId }, { points: updatedPoints });
+    //     return { success: true };
+    //   } catch (err) {
+    //     return {
+    //       success: false,
+    //       errors: [{ message: "Internal Server Error.", field: "" }],
+    //     };
+    //   }
+    // }
+
+    // Insert new upvote
+    // await Upvote.insert({
+    //   userId,
+    //   postId,
+    //   value: realValue,
+    // });
+
+    // Create Vote & Update Post points
+    // try {
+    //   await conn.transaction(async (tm) => {
+    //     await tm.query(`
+    //       insert into upvote ("userId", "postId", value)
+    //       values (${userId},${postId},${realValue})
+    //       `);
+
+    //     await tm.query(`update post
+    //       set points = points + ${realValue}
+    //       where id = ${postId}`);
+    //   });
+    //   return { success: true };
+    // } catch (err) {
+    //   return {
+    //     success: false,
+    //     errors: [{ message: "Internal Server Error.", field: "" }],
+    //   };
+    // }
   }
 }

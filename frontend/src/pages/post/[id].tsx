@@ -1,26 +1,26 @@
-import { Box } from "@chakra-ui/react";
-import { withUrqlClient } from "next-urql";
-import React from "react";
-import { Layout } from "../../components/Layout";
-import { PostItem } from "../../components/PostItem";
-import { useMeQuery } from "../../generated/graphql";
-import { createUrqlClient } from "../../utils/createUrqlClient";
-import { useGetPostFromURL } from "../../utils/useGetPostFromURL";
+import { Box } from "@chakra-ui/react"
+import { withUrqlClient } from "next-urql"
+import React from "react"
+import { Layout } from "../../app/layout"
+import { PostItem } from "../../components/PostItem"
+import { useMeQuery } from "../../generated/graphql"
+import { createUrqlClient } from "../../utils/createUrqlClient"
+import { useGetPostFromURL } from "../../utils/useGetPostFromURL"
 
 interface PostProps {
   // id: number;
 }
 
 const Post: React.FC<PostProps> = () => {
-  const [{ data: meData }] = useMeQuery();
-  const [{ data, fetching, error }] = useGetPostFromURL();
+  const [{ data: meData }] = useMeQuery()
+  const [{ data, fetching, error }] = useGetPostFromURL()
 
   if (fetching) {
     return (
       <Layout>
         <Box>loading</Box>
       </Layout>
-    );
+    )
   }
 
   if (error) {
@@ -28,7 +28,7 @@ const Post: React.FC<PostProps> = () => {
       <Layout>
         <Box>error</Box>
       </Layout>
-    );
+    )
   }
 
   if (!data?.post) {
@@ -36,7 +36,7 @@ const Post: React.FC<PostProps> = () => {
       <Layout>
         <Box>Cannot find post</Box>
       </Layout>
-    );
+    )
   }
 
   return (
@@ -48,7 +48,7 @@ const Post: React.FC<PostProps> = () => {
         canEdit={data.post.creator.id === meData?.me?.id}
       />
     </Layout>
-  );
-};
+  )
+}
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Post);
+export default withUrqlClient(createUrqlClient, { ssr: true })(Post)

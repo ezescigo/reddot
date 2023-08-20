@@ -1,38 +1,29 @@
-import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
-import React, { useState } from "react";
-import { useVoteMutation } from "../generated/graphql";
+import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons"
+import { Box, Flex, IconButton, Text } from "@chakra-ui/react"
+import React, { useState } from "react"
+import { useVoteMutation } from "../generated/graphql"
 
 interface VotesSectionProps {
-  postId: number;
-  points: number;
-  voteStatus?: number | null;
+  postId: number
+  points: number
+  voteStatus?: number | null
 }
 
-export const VotesSection: React.FC<VotesSectionProps> = ({
-  postId,
-  points,
-  voteStatus,
-}) => {
-  const [, vote] = useVoteMutation();
-  const [voteLoading, setVoteLoading] = useState<
-    "up-loading" | "down-loading" | "not-loading"
-  >("not-loading");
+export const VotesSection: React.FC<VotesSectionProps> = ({ postId, points, voteStatus }) => {
+  const [, vote] = useVoteMutation()
+  const [voteLoading, setVoteLoading] = useState<"up-loading" | "down-loading" | "not-loading">(
+    "not-loading"
+  )
   return (
-    <Flex
-      direction="column"
-      justifyContent="center"
-      alignItems="center"
-      mr={"3"}
-    >
+    <Flex direction="column" justifyContent="center" alignItems="center" mr={"3"}>
       <IconButton
         onClick={async () => {
-          setVoteLoading("up-loading");
+          setVoteLoading("up-loading")
           await vote({
             postId: postId,
-            value: 1,
-          });
-          setVoteLoading("not-loading");
+            value: voteStatus === 1 ? 0 : 1,
+          })
+          setVoteLoading("not-loading")
         }}
         isLoading={voteLoading === "up-loading"}
         variant="solid"
@@ -45,12 +36,12 @@ export const VotesSection: React.FC<VotesSectionProps> = ({
       </Box>
       <IconButton
         onClick={async () => {
-          setVoteLoading("down-loading");
+          setVoteLoading("down-loading")
           await vote({
             postId: postId,
-            value: -1,
-          });
-          setVoteLoading("not-loading");
+            value: voteStatus === -1 ? 0 : -1,
+          })
+          setVoteLoading("not-loading")
         }}
         isLoading={voteLoading === "down-loading"}
         variant="solid"
@@ -59,5 +50,5 @@ export const VotesSection: React.FC<VotesSectionProps> = ({
         icon={<ArrowDownIcon boxSize={5} />}
       />
     </Flex>
-  );
-};
+  )
+}

@@ -1,27 +1,27 @@
-import { Box, Button, Flex, Stack } from "@chakra-ui/react";
-import { withUrqlClient } from "next-urql";
-import { useState } from "react";
-import { Layout } from "../components/Layout";
-import NewPost from "../components/NewPost";
-import { PostItem } from "../components/PostItem";
-import { useMeQuery, usePostsQuery } from "../generated/graphql";
-import { createUrqlClient } from "../utils/createUrqlClient";
+import { Box, Button, Flex, Stack } from "@chakra-ui/react"
+import { withUrqlClient } from "next-urql"
+import { useState } from "react"
+import { Layout } from "../app/layout"
+import NewPost from "../components/NewPost"
+import { PostItem } from "../components/PostItem"
+import { useMeQuery, usePostsQuery } from "../generated/graphql"
+import { createUrqlClient } from "../utils/createUrqlClient"
 
 interface Variables {
-  limit: number;
-  cursor: string | null;
+  limit: number
+  cursor: string | null
 }
 
 const Index = () => {
   const [variables, setVariables] = useState<Variables>({
     limit: 15,
     cursor: null,
-  });
+  })
   const [{ data, error, fetching }] = usePostsQuery({
     variables,
-  });
+  })
 
-  const [{ data: meData }] = useMeQuery();
+  const [{ data: meData }] = useMeQuery()
 
   if (!fetching && !data) {
     return (
@@ -29,7 +29,7 @@ const Index = () => {
         <div>There's been an error loading posts.</div>
         <div>{error?.message}</div>
       </div>
-    );
+    )
   }
 
   return (
@@ -77,7 +77,7 @@ const Index = () => {
         ) : null}
       </Flex>
     </Layout>
-  );
-};
+  )
+}
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
+export default withUrqlClient(createUrqlClient, { ssr: true })(Index)
