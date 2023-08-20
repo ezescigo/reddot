@@ -13,6 +13,7 @@
     "@chakra-ui/theme-tools": "^2.0.2",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@tabler/icons-react": "^2.31.0",
     "@urql/exchange-graphcache": "^5.0.5",
     "formik": "^2.2.9",
     "framer-motion": "^6.5.1",

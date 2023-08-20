@@ -8,9 +8,10 @@ interface BetterConnectionOptions extends PostgresConnectionOptions {
 const config: BetterConnectionOptions = {
   type: "postgres",
   host: "localhost",
+  port: 5432,
   username: "postgres",
-  password: "saigon3431",
-  database: "libreddot",
+  password: "admin",
+  database: "reddot",
   migrations: ["./src/migrations/*.js"],
   logging: true,
   synchronize: true,

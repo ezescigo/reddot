@@ -4,31 +4,31 @@ import {
   Flex,
   Heading,
   Link as ChakraLink,
-} from "@chakra-ui/react";
-import Link from "next/link";
-import React from "react";
-import { useLogoutMutation, useMeQuery } from "../generated/graphql";
-import { useRouter } from "next/router";
+  useDisclosure,
+  Text,
+} from "@chakra-ui/react"
+import Link from "next/link"
+import React, { useState } from "react"
+import { useLogoutMutation, useMeQuery } from "../generated/graphql"
+import { useRouter } from "next/router"
+import { DarkModeSwitch } from "./DarkModeSwitch"
+import { UserMenu } from "./UserMenu"
 
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
-  const router = useRouter();
-  const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
-  const [{ data }] = useMeQuery();
+  const [{ data }] = useMeQuery()
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <Flex position="sticky" top={0} zIndex={1} bg="tomato" p={4} ml={"auto"}>
       <Flex flex={1} m="auto" align="center" maxW={800}>
-        <ChakraLink href="/">
-          <Heading>Reddot</Heading>
-        </ChakraLink>
+        <Flex position="fixed" left={4}>
+          <ChakraLink href="/">
+            <Heading>R.</Heading>
+          </ChakraLink>
+        </Flex>
         <Flex ml="auto" align={"center"}>
-          {/* <Box ml="auto" mr={2}>
-            <Link href="/create-post">
-              <Button colorScheme="purple">Create Post</Button>
-            </Link>
-          </Box> */}
           {!data?.me ? (
             <>
               <Box mr={2}>
@@ -40,21 +40,14 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
             </>
           ) : (
             <>
-              <Box mr={2}>{data?.me?.username}</Box>
-              <Button
-                onClick={async () => {
-                  await logout({});
-                  router.reload();
-                }}
-                isLoading={logoutFetching}
-                variant={"link"}
-              >
-                logout
+              <Button variant={"unstyled"} onClick={onOpen} mr={2}>
+                {data?.me?.username}
               </Button>
+              <UserMenu user={data} isOpen={isOpen} onCloseDrawer={onClose} />
             </>
           )}
         </Flex>
       </Flex>
     </Flex>
-  );
-};
+  )
+}

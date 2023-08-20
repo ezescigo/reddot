@@ -45,14 +45,16 @@ export const PostItem: React.FC<PostItemProps> = ({
         {`by ${post.creator.username}`}
         <Flex>
           <Box mt={4} mb={2}>
-            <Text>{`${post.textSnippet}...`}</Text>
+            <Text>
+              {post.text.length > 70 ? `${post.textSnippet}...` : post.text}
+            </Text>
           </Box>
         </Flex>
       </Box>
       <Box>
         {canEdit && (
           <IconButton
-            icon={<EditIcon />}
+            icon={<EditIcon fontSize={"2xl"} />}
             aria-label="Edit Post"
             variant="link"
             onClick={() => router.push(`/post/edit/${post.id}`)}
@@ -60,7 +62,7 @@ export const PostItem: React.FC<PostItemProps> = ({
         )}
         {canDelete && (
           <IconButton
-            icon={<DeleteIcon />}
+            icon={<DeleteIcon fontSize={"2xl"} />}
             aria-label="Delete Post"
             variant="link"
             color="red.600"

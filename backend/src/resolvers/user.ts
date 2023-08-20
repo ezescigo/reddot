@@ -103,6 +103,7 @@ export class UserResolver {
         ? { email: usernameOrEmail }
         : { username: usernameOrEmail }
     );
+    console.log(user);
     if (!user) {
       return {
         errors: [
