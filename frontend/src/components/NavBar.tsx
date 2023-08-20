@@ -1,17 +1,6 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Link as ChakraLink,
-  useDisclosure,
-  Text,
-} from "@chakra-ui/react"
-import Link from "next/link"
-import React, { useState } from "react"
-import { useLogoutMutation, useMeQuery } from "../generated/graphql"
-import { useRouter } from "next/router"
-import { DarkModeSwitch } from "./DarkModeSwitch"
+import { Box, Button, Link as ChakraLink, Flex, Heading, useDisclosure } from "@chakra-ui/react"
+import React from "react"
+import { useMeQuery } from "../generated/graphql"
 import { UserMenu } from "./UserMenu"
 
 interface NavBarProps {}
