@@ -54,7 +54,13 @@ export const UserMenu: React.FC<UserMenuProps> = ({ user, isOpen, onCloseDrawer 
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth="1px">{user.me?.username}</DrawerHeader>
         <DrawerBody borderBottomWidth="1px" pt={4} pl={2}>
-          <UserMenuButton label="Your profile" icon={<IconUser />} onClick={() => {}} />
+          <UserMenuButton
+            label="Your profile"
+            icon={<IconUser />}
+            onClick={() => {
+              router.push("/profile")
+            }}
+          />
           <DarkModeSwitch />
         </DrawerBody>
         {/* <DrawerBody borderBottomWidth="1px" pt={4} pl={4}>

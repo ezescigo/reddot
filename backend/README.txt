@@ -10,6 +10,9 @@ createdb nameDB
 exit:
 \q
 
+// Restart Redis
+sudo systemctl start redis-server
+
 Third party libraries I use:
 
 - Mikro-ORM
