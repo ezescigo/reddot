@@ -2,5 +2,11 @@ query Me {
   me {
     id
     username
+    email
+    createdAt
+    name
+    company
+    location
+    description
   }
 }

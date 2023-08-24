@@ -7,6 +7,12 @@ mutation Login($usernameOrEmail: String!, $password: String!) {
     user {
       id
       username
+      name
+      company
+      location
+      description
+      email
+      createdAt
     }
   }
 }

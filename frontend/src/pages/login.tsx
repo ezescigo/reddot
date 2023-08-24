@@ -1,32 +1,31 @@
-import React from "react";
-import { Form, Formik } from "formik";
-import { Box, Button, Flex } from "@chakra-ui/react";
-import Wrapper from "../components/Wrapper";
-import { InputField } from "../components/InputField";
-import { useLoginMutation } from "../generated/graphql";
-import { toErrorMap } from "../utils/toErrorMap";
-import { useRouter } from "next/router";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/createUrqlClient";
-import NextLink from "next/link";
+import React from "react"
+import { Form, Formik } from "formik"
+import { Box, Button, Flex } from "@chakra-ui/react"
+import Wrapper from "../components/Wrapper"
+import { InputField } from "../components/InputField"
+import { useLoginMutation } from "../generated/graphql"
+import { toErrorMap } from "../utils/toErrorMap"
+import { useRouter } from "next/router"
+import { withUrqlClient } from "next-urql"
+import { createUrqlClient } from "../utils/createUrqlClient"
+import NextLink from "next/link"
 
 const Login: React.FC<{}> = ({}) => {
-  const [{}, login] = useLoginMutation();
-  const router = useRouter();
+  const [{}, login] = useLoginMutation()
+  const router = useRouter()
   return (
     <Wrapper variant="small">
       <Formik
         initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
-          console.log(values);
-          const response = await login(values);
+          console.log(values)
+          const response = await login(values)
+          console.log(response)
           if (response.data?.login.errors) {
-            setErrors(toErrorMap(response.data.login.errors));
+            setErrors(toErrorMap(response.data.login.errors))
           } else if (response.data?.login.user) {
             // User created
-            router.push(
-              typeof router.query.next === "string" ? router.query.next : "/"
-            );
+            router.push(typeof router.query.next === "string" ? router.query.next : "/")
           }
         }}
       >
@@ -47,19 +46,14 @@ const Login: React.FC<{}> = ({}) => {
                 </NextLink>
               </Box>
             </Flex>
-            <Button
-              mt={4}
-              type="submit"
-              isLoading={isSubmitting}
-              color={"teal.800"}
-            >
+            <Button mt={4} type="submit" isLoading={isSubmitting} color={"teal.800"}>
               Login
             </Button>
           </Form>
         )}
       </Formik>
     </Wrapper>
-  );
-};
+  )
+}
 
-export default withUrqlClient(createUrqlClient)(Login);
+export default withUrqlClient(createUrqlClient)(Login)

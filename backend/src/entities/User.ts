@@ -29,6 +29,54 @@ export class User extends BaseEntity {
   @Column()
   password!: string;
 
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  name: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  description: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  pronouns: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  company: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  location: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  timezone: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  socialProfile1: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  socialProfile2: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  socialProfile3: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  socialProfile4: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  socialProfile5: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", nullable: true })
+  website: string | null;
+
   @OneToMany(() => Post, (post) => post.creator)
   posts: Post[];
 

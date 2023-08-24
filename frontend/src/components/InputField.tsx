@@ -5,15 +5,15 @@ import {
   Input,
   Textarea,
   TextareaProps,
-} from "@chakra-ui/react";
-import { useField } from "formik";
-import React, { InputHTMLAttributes } from "react";
+} from "@chakra-ui/react"
+import { useField } from "formik"
+import React, { InputHTMLAttributes } from "react"
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement & TextareaProps> & {
-  name: string;
-  label: string;
-  textArea?: boolean;
-};
+  name: string
+  label?: string
+  textArea?: boolean
+}
 
 export const InputField: React.FunctionComponent<InputFieldProps> = ({
   label,
@@ -21,10 +21,10 @@ export const InputField: React.FunctionComponent<InputFieldProps> = ({
   textArea,
   ...props
 }) => {
-  const [field, { error }] = useField(props);
+  const [field, { error }] = useField(props)
   return (
     <FormControl isInvalid={!!error}>
-      <FormLabel htmlFor={field.name}>{label}</FormLabel>
+      {label && <FormLabel htmlFor={field.name}>{label}</FormLabel>}
       {textArea ? (
         <Textarea {...field} {...props} id={field.name} />
       ) : (
@@ -32,5 +32,5 @@ export const InputField: React.FunctionComponent<InputFieldProps> = ({
       )}
       {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>
-  );
-};
+  )
+}

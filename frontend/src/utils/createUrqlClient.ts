@@ -179,6 +179,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
                 { query: MeDocument },
                 _result,
                 (result, query) => {
+                  console.log(result.login)
                   if (result.login.errors) {
                     return query
                   } else {

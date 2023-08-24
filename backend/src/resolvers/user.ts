@@ -19,6 +19,7 @@ import { validateRegister } from "../utils/validateRegister";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
 import { validatePassword } from "../utils/validatePassword";
+import { ProfileInput } from "./types/ProfileInput";
 
 @ObjectType()
 export class FieldError {
@@ -35,6 +36,15 @@ class UserResponse {
   @Field(() => User, { nullable: true })
   user?: User;
 }
+
+// @ObjectType()
+// class UserLoginResponse {
+//   @Field(() => [FieldError], { nullable: true })
+//   errors?: FieldError[];
+
+//   @Field(() => User, { nullable: true })
+//   user?: Pick<User, "id" | "username">;
+// }
 
 @Resolver(User)
 export class UserResolver {
@@ -103,7 +113,7 @@ export class UserResolver {
         ? { email: usernameOrEmail }
         : { username: usernameOrEmail }
     );
-    console.log(user);
+    console.log("login", user);
     if (!user) {
       return {
         errors: [
@@ -127,6 +137,7 @@ export class UserResolver {
     }
 
     req.session.userId = user.id;
+    console.log("return login", user);
     return {
       user,
     };
@@ -226,5 +237,54 @@ export class UserResolver {
         resolve(true);
       })
     );
+  }
+
+  // Profile
+
+  @Query(() => User, { nullable: true })
+  async getProfile(@Ctx() { req }: MyContext) {
+    // Not logged in
+    if (!req.session.userId) {
+      return null;
+    }
+
+    return await User.findOneBy({ id: req.session.userId });
+  }
+
+  @Mutation(() => UserResponse)
+  async editProfile(
+    @Arg("options") options: ProfileInput
+    // @Ctx() { req }: MyContext
+  ): Promise<UserResponse> {
+    // const errors = validateRegister(options);
+    // if (errors) {
+    //   return { errors };
+    // }
+
+    const usernameExists = await User.findOneBy({ id: options.id });
+    if (!usernameExists) {
+      return {
+        errors: [
+          {
+            field: "username",
+            message: "Username does not exists.",
+          },
+        ],
+      };
+    }
+
+    const updatedUser = { ...usernameExists, ...options } as User;
+
+    const user = await User.update(
+      {
+        id: options.id,
+      },
+      { ...updatedUser }
+    );
+
+    console.log("-------------------user:", user);
+    // store user id in session (cookie)
+    // req.session.userId = user.id;
+    return { user: updatedUser };
   }
 }
