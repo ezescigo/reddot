@@ -8,5 +8,11 @@ query Me {
     company
     location
     description
+    website
+    socialProfile1
+    socialProfile2
+    socialProfile3
+    socialProfile4
+    socialProfile5
   }
 }

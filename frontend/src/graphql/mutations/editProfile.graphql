@@ -1,0 +1,26 @@
+mutation EditProfile($options: ProfileInput!) {
+  editProfile(options: $options) {
+    user {
+      id
+      username
+      email
+      name
+      description
+      pronouns
+      company
+      location
+      timezone
+      socialProfile1
+      socialProfile2
+      socialProfile3
+      socialProfile4
+      socialProfile5
+      website
+      createdAt
+    }
+    errors {
+      field
+      message
+    }
+  }
+}

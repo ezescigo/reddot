@@ -282,7 +282,7 @@ export class UserResolver {
       { ...updatedUser }
     );
 
-    console.log("-------------------user:", user);
+    console.log("-------------------updated user:", user);
     // store user id in session (cookie)
     // req.session.userId = user.id;
     return { user: updatedUser };

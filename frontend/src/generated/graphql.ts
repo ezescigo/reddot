@@ -8,7 +8,7 @@ export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K]
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-
+/** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string
   String: string
@@ -152,23 +152,23 @@ export type QueryPostsArgs = {
 
 export type User = {
   __typename?: "User"
-  company: Scalars["String"]
+  company?: Maybe<Scalars["String"]>
   createdAt: Scalars["String"]
-  description: Scalars["String"]
+  description?: Maybe<Scalars["String"]>
   email: Scalars["String"]
   id: Scalars["Float"]
-  location: Scalars["String"]
-  name: Scalars["String"]
-  pronouns: Scalars["String"]
-  socialProfile1: Scalars["String"]
-  socialProfile2: Scalars["String"]
-  socialProfile3: Scalars["String"]
-  socialProfile4: Scalars["String"]
-  socialProfile5: Scalars["String"]
-  timezone: Scalars["String"]
+  location?: Maybe<Scalars["String"]>
+  name?: Maybe<Scalars["String"]>
+  pronouns?: Maybe<Scalars["String"]>
+  socialProfile1?: Maybe<Scalars["String"]>
+  socialProfile2?: Maybe<Scalars["String"]>
+  socialProfile3?: Maybe<Scalars["String"]>
+  socialProfile4?: Maybe<Scalars["String"]>
+  socialProfile5?: Maybe<Scalars["String"]>
+  timezone?: Maybe<Scalars["String"]>
   updatedAt: Scalars["String"]
   username: Scalars["String"]
-  website: Scalars["String"]
+  website?: Maybe<Scalars["String"]>
 }
 
 export type UserResponse = {
@@ -243,6 +243,37 @@ export type DeletePostMutation = {
   } | null
 }
 
+export type EditProfileMutationVariables = Exact<{
+  options: ProfileInput
+}>
+
+export type EditProfileMutation = {
+  __typename?: "Mutation"
+  editProfile: {
+    __typename?: "UserResponse"
+    user?: {
+      __typename?: "User"
+      id: number
+      username: string
+      email: string
+      name?: string | null
+      description?: string | null
+      pronouns?: string | null
+      company?: string | null
+      location?: string | null
+      timezone?: string | null
+      socialProfile1?: string | null
+      socialProfile2?: string | null
+      socialProfile3?: string | null
+      socialProfile4?: string | null
+      socialProfile5?: string | null
+      website?: string | null
+      createdAt: string
+    } | null
+    errors?: Array<{ __typename?: "FieldError"; field: string; message: string }> | null
+  }
+}
+
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars["String"]
 }>
@@ -263,10 +294,10 @@ export type LoginMutation = {
       __typename?: "User"
       id: number
       username: string
-      name: string
-      company: string
-      location: string
-      description: string
+      name?: string | null
+      company?: string | null
+      location?: string | null
+      description?: string | null
       email: string
       createdAt: string
     } | null
@@ -290,10 +321,10 @@ export type RegisterMutation = {
       __typename?: "User"
       id: number
       username: string
-      name: string
-      company: string
-      location: string
-      description: string
+      name?: string | null
+      company?: string | null
+      location?: string | null
+      description?: string | null
       email: string
       createdAt: string
     } | null
@@ -346,10 +377,16 @@ export type MeQuery = {
     username: string
     email: string
     createdAt: string
-    name: string
-    company: string
-    location: string
-    description: string
+    name?: string | null
+    company?: string | null
+    location?: string | null
+    description?: string | null
+    website?: string | null
+    socialProfile1?: string | null
+    socialProfile2?: string | null
+    socialProfile3?: string | null
+    socialProfile4?: string | null
+    socialProfile5?: string | null
   } | null
 }
 
@@ -479,6 +516,38 @@ export const DeletePostDocument = gql`
 export function useDeletePostMutation() {
   return Urql.useMutation<DeletePostMutation, DeletePostMutationVariables>(DeletePostDocument)
 }
+export const EditProfileDocument = gql`
+  mutation EditProfile($options: ProfileInput!) {
+    editProfile(options: $options) {
+      user {
+        id
+        username
+        email
+        name
+        description
+        pronouns
+        company
+        location
+        timezone
+        socialProfile1
+        socialProfile2
+        socialProfile3
+        socialProfile4
+        socialProfile5
+        website
+        createdAt
+      }
+      errors {
+        field
+        message
+      }
+    }
+  }
+`
+
+export function useEditProfileMutation() {
+  return Urql.useMutation<EditProfileMutation, EditProfileMutationVariables>(EditProfileDocument)
+}
 export const ForgotPasswordDocument = gql`
   mutation ForgotPassword($email: String!) {
     forgotPassword(email: $email)
@@ -594,6 +663,12 @@ export const MeDocument = gql`
       company
       location
       description
+      website
+      socialProfile1
+      socialProfile2
+      socialProfile3
+      socialProfile4
+      socialProfile5
     }
   }
 `
